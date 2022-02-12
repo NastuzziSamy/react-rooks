@@ -91,33 +91,29 @@ import * as React from 'react';
 import { Rook, useRook } from './rook';
 
 export const ChangeLocale = () => {
-    const [, setLocale] = useRook('locale');
+	const [locale, setLocale] = useRook('locale');
 
-    React.useEffect(() => setTimeout(
-        () => setLocale('fr'), 2500
-    ), []);
+	React.useEffect(() => setTimeout(() => setLocale('fr'), 2500), []);
 
-    return null;
+	return null;
 };
 
 export const ShowLocale = () => {
-    const [locale] = useRook('locale');
+	const [locale] = useRook('locale');
 
-    // Log: 'en'.
-    // After 2.5s, log: 'fr'.
-    console.log(locale);
+	// Log: 'en'.
+	// After 2.5s, log: 'fr'.
+	console.log(locale);
 
-    return null;
+	return null;
 };
 
-export const App = ({ sentryRouting }) => {
-	return (
-        <Rook>
-            </ChangeLocale>
-            </ShowLocale>
-        </Rook>
-	);
-};
+export const App = ({ sentryRouting }) => (
+	<Rook>
+		<ChangeLocale />
+		<ShowLocale />
+	</Rook>
+);
 
 export default App;
 ```
