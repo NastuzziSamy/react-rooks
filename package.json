@@ -1,6 +1,8 @@
 {
   "name": "react-rooks",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "main": "lib/index.jsx",
+  "types": "lib/index.d.ts",
   "description": "Store management for React and React Native with simple hooks !",
   "repository": {
     "type": "git",
@@ -25,6 +27,7 @@
   },
   "homepage": "https://github.com/NastuzziSamy/react-rooks",
   "devDependencies": {
+    "@types/react": "^17.0.39",
     "typescript": "^4.5.5"
   },
   "dependencies": {
