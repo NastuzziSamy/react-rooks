@@ -42,7 +42,7 @@ export const [Rook, useRook] = createRook({
     locale: 'en',
     title: 'My React app',
 } as {
-    storedUser: { id?: string; name: string; /* whatever */ };
+    storedUser: { id?: string; name?: string; /* whatever */ };
     locale: 'en' | 'fr';
     title: string;
 });
@@ -112,12 +112,10 @@ export const ShowLocale = () => {
 
 export const App = ({ sentryRouting }) => {
 	return (
-		<SafeAreaProvider>
-            <Rook>
-                </ChangeLocale>
-                </ShowLocale>
-            </Rook>
-		</SafeAreaProvider>
+        <Rook>
+            </ChangeLocale>
+            </ShowLocale>
+        </Rook>
 	);
 };
 
