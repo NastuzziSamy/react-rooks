@@ -1,4 +1,29 @@
 {
+  "name": "react-rooks",
+  "version": "1.0.0",
+  "description": "Store management for React and React Native with simple hooks !",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NastuzziSamy/react-rooks.git"
+  },
+  "keywords": [
+    "react",
+    "reactjs",
+    "store",
+    "hook",
+    "rook",
+    "rooks",
+    "simple",
+    "quick",
+    "light",
+    "redux"
+  ],
+  "author": "Samy NASTUZZI",
+  "license": "MIT",
+  "bugs": {
+    "url": "git+https://github.com/NastuzziSamy/react-rooks/issues"
+  },
+  "homepage": "https://github.com/NastuzziSamy/react-rooks",
   "devDependencies": {
     "typescript": "^4.5.5"
   },
