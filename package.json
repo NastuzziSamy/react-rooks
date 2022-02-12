@@ -1,7 +1,7 @@
 {
   "name": "react-rooks",
-  "version": "1.0.1",
-  "main": "lib/index.jsx",
+  "version": "1.0.2",
+  "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "description": "Store management for React and React Native with simple hooks !",
   "repository": {
