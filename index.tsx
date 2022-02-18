@@ -1,4 +1,4 @@
-import React, { ReactChild } from 'react';
+import React from 'react';
 
 type ValueOf<StoreType> = StoreType[Extract<keyof StoreType, string>];
 
@@ -19,13 +19,15 @@ export type Context<StoreType> = {
 	add: CallableFunction;
 };
 
-export const RookContainer = ({ rooks, children }: { rooks: Array<React.FunctionComponent>; children: ReactChild }) => {
-	let contained = children;
+export const RookContainer = ({ rooks, children }: { rooks: Array<React.FunctionComponent>; children: React.ReactNode }): JSX.Element => {
+	let contained = <>{children}</>;
 
 	rooks.reverse().forEach((Rook) => {
-		<Rook>
-			{contained}
-		</Rook>
+		contained = (
+			<Rook>
+				{contained}
+			</Rook>
+		);
 	})
 
 	return contained;
