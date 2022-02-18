@@ -83,7 +83,32 @@ As you can see, `createRook` returns an array:
 - `Rook` is the context of your store. You must add it before using the hook `useRook` in your components. `Rook` can be nested, with a duplicated nested store.
 - `useRook` is a hook, that retrieve the current store an is similar to `React.useState`.
 
-# Then, use it !
+### Usage with multiple rooks!
+
+Instead of nesting your rooks, you can contain them all together:
+```typescript
+// From:
+export const App = () => (
+	<FirstRook>
+	    <SecondRook>
+            {/* ...more nested rooks... */}
+		        {/* Your app */}
+            {/* ...more nested rooks... */}
+	    </SecondRook>
+	</FirstRook>
+);
+
+// To:
+import { RookContainer } from 'react-rooks';
+
+export const App = () => (
+	<RookContainer rooks={[FirstRook, SecondRook, /* ...more rooks... */]}>
+        {/* Your app */}
+	</FirstRook>
+);
+```
+
+# Then, use it!
 
 `App.tsx`:
 ```typescript
@@ -108,7 +133,7 @@ export const ShowLocale = () => {
 	return null;
 };
 
-export const App = ({ sentryRouting }) => (
+export const App = () => (
 	<Rook>
 		<ChangeLocale />
 		<ShowLocale />

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactChild } from 'react';
 
 type ValueOf<StoreType> = StoreType[Extract<keyof StoreType, string>];
 
@@ -18,6 +18,18 @@ export type Context<StoreType> = {
 	set: CallableFunction;
 	add: CallableFunction;
 };
+
+export const RookContainer = ({ rooks, children }: { rooks: Array<React.FunctionComponent>; children: ReactChild }) => {
+	let contained = children;
+
+	rooks.reverse().forEach((Rook) => {
+		<Rook>
+			{contained}
+		</Rook>
+	})
+
+	return contained;
+}
 
 export const createRook = <StoreType extends { [key: string]: any }>(
 	store: StoreType,
