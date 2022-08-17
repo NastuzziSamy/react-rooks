@@ -47,6 +47,7 @@ export const createRook = <StoreType extends { [key: string]: any }>(
 	const { Provider } = context;
 
 	const Rook: React.FunctionComponent = ({ children }) => {
+		const [inited, setInited] = React.useState<boolean>(false);
 		const [rookStore, setRookStore] = React.useState<StoreType>(store);
 
 		const reduceValues = (values: StoreType) => {
@@ -89,9 +90,11 @@ export const createRook = <StoreType extends { [key: string]: any }>(
 			[setRookStore]
 		);
 
-		const values = { store: rookStore, set: setStore, add: addToStore };
+		const values = { store: rookStore, set: setStore, add: addToStore, inited };
 
-		if (init) {
+		if (!inited && init) {
+			setInited(true);
+
 			init(values);
 		}
 
