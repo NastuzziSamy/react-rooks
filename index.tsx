@@ -35,7 +35,8 @@ export const RookContainer = ({ rooks, children }: { rooks: Array<React.Function
 
 export const createRook = <StoreType extends { [key: string]: any }>(
 	store: StoreType,
-	reducers: Reducers<StoreType> = {} as Reducers<StoreType>
+	reducers: Reducers<StoreType> = {} as Reducers<StoreType>,
+	init: CallableFunction,
 ): [
 	React.FunctionComponent,
 	<T extends keyof StoreType | undefined>(
@@ -88,8 +89,14 @@ export const createRook = <StoreType extends { [key: string]: any }>(
 			[setRookStore]
 		);
 
+		const values = { store: rookStore, set: setStore, add: addToStore };
+
+		if (init) {
+			init(values);
+		}
+
 		return (
-			<Provider value={{ store: rookStore, set: setStore, add: addToStore }}>{children}</Provider>
+			<Provider value={values}>{children}</Provider>
 		);
 	};
 
