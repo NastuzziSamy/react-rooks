@@ -15,7 +15,6 @@ export type Reducers<StoreType> =
 
 export type Context<StoreType> = {
 	store: StoreType;
-	set: CallableFunction;
 	add: CallableFunction;
 };
 
@@ -82,7 +81,9 @@ export const createRook = <StoreType extends { [key: string]: any }>(
 
 		const values = { store: rookStore, add: addToStore };
 
-		React.useEffect(() => init?.(rookStore, addToStore), []);
+		React.useEffect(() => {
+			init?.(addToStore, rookStore);
+		}, []);
 
 		return (
 			<Provider value={values}>{children}</Provider>
