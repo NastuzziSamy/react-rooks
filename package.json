@@ -1,9 +1,9 @@
 {
   "name": "react-rooks",
-  "version": "1.4.0",
-  "main": "./lib/cjs/index.js",
-  "module": "./lib/esm/index.js",
-  "types": "./lib/esm/index.d.ts",
+  "version": "1.5.0",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "description": "Store management for React and React Native with simple hooks !",
   "repository": {
     "type": "git",
@@ -28,12 +28,13 @@
   },
   "homepage": "https://github.com/NastuzziSamy/react-rooks",
   "scripts": {
-    "build": "npm run build:esm && npm run build:cjs",
-    "build:esm": "tsc",
-    "build:cjs": "tsc --module commonjs --outDir lib/cjs"
+    "build": "npm run build:esm && npm run build:cjs && npm run build:types",
+    "build:esm": "tsc --outDir dist/esm",
+    "build:cjs": "tsc --outDir dist/cjs --module commonjs",
+    "build:types": "tsc --outDir dist/types --declaration --emitDeclarationOnly"
   },
   "files": [
-    "/lib"
+    "/dist"
   ],
   "devDependencies": {
     "@types/react": "^17.0.39",

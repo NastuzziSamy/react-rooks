@@ -47,7 +47,6 @@ export const createRook = <StoreType extends { [key: string]: any }>(
 	const { Provider } = context;
 
 	const Rook: React.FunctionComponent = ({ children }) => {
-		const [inited, setInited] = React.useState<boolean>(false);
 		const [rookStore, setRookStore] = React.useState<StoreType>(store);
 
 		const reduceValues = (values: StoreType) => {
@@ -81,22 +80,9 @@ export const createRook = <StoreType extends { [key: string]: any }>(
 			[setRookStore]
 		);
 
-		const setStore = React.useCallback(
-			(values: StoreType, reduce = true) => {
-				const reducedValues = reduce ? values : reduceValues(values);
+		const values = { store: rookStore, add: addToStore };
 
-				setRookStore(reducedValues);
-			},
-			[setRookStore]
-		);
-
-		const values = { store: rookStore, set: setStore, add: addToStore, inited };
-
-		if (!inited && init) {
-			setInited(true);
-
-			init(values);
-		}
+		React.useEffect(() => init?.(rookStore, addToStore), []);
 
 		return (
 			<Provider value={values}>{children}</Provider>
@@ -106,10 +92,10 @@ export const createRook = <StoreType extends { [key: string]: any }>(
 	const useRook = <T extends keyof StoreType | undefined>(
 		name?: T
 	): [T extends undefined ? StoreType : ValueOf<StoreType>, CallableFunction] => {
-		const { store, set, add } = React.useContext(context);
+		const { store, add } = React.useContext(context);
 
 		if (name === undefined) {
-			return [store as T extends undefined ? StoreType : ValueOf<StoreType>, set];
+			return [store as T extends undefined ? StoreType : ValueOf<StoreType>, add];
 		}
 
 		return [
