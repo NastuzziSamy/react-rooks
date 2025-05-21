@@ -1,44 +1,61 @@
-import * as React from 'react';
-import createRook, { RookContainer} from 'react-rooks';
+import * as React from "react";
+import { createRook } from "react-rooks";
+
+enum Locale {
+  EN = "en",
+  FR = "fr",
+}
 
 // Some global/stored values.
-export const [FirstRook, useFirstRook] = createRook({
-    storedUser: {},
-    locale: 'en',
-    title: 'My React app',
-} as {
-    storedUser: { id?: string; name?: string; /* whatever */ };
-    locale: 'en' | 'fr';
-    title: string;
+export const [Rook, useRook] = createRook<{
+  user: { id: number; name: string } | null;
+  locale: Locale;
+  title: string;
+}>({
+  user: null,
+  locale: Locale.EN,
+  title: "My React app",
 });
 
-export const [SecondRook, useSecondRook] = createRook({
-    loaded: false,
-	connected: false,
-} as {
-    loaded: boolean;
-    connected: boolean;
-});
+export const ChangeLocale = () => {
+  const [title, setTitle] = useRook("title");
+  const [user, setUser] = useRook("user");
 
-export const FirstComponent = () => {
-	const [locale, setLocale] = useFirstRook('locale');
-	const [connected, setConnected] = useSecondRook('connected');
+  setUser({ id: 1, name: "John Doe" });
+  setUser(null);
+  setUser((prev: { id: number; name: string } | null) => ({
+    id: prev?.id ? prev.id + 1 : 1,
+    name: "Jane Doe",
+  }));
+  const [locale, setLocale] = useRook("locale");
+  const [store, setStore] = useRook();
 
-	return null;
+  React.useEffect(() => {
+    setTimeout(() => setLocale(Locale.FR), 2500);
+  }, []);
+
+  return null;
 };
 
-export const SecondComponent = () => {
-	const [title, setTitle] = useFirstRook('title');
-	const [loaded, setLoaded] = useSecondRook('loaded');
+export const ShowLocale = () => {
+  const [locale] = useRook("locale");
 
-	return null;
+  // Log: 'en'.
+  // After 2.5s, log: 'fr'.
+  console.log(locale);
+
+  return (
+    <div>
+      <h1>Current locale: {locale}</h1>
+    </div>
+  );
 };
 
 export const App = () => (
-	<RookContainer rooks={[FirstRook, SecondRook]}>
-		<FirstComponent />
-		<SecondComponent />
-	</RookContainer>
+  <Rook>
+    <ChangeLocale />
+    <ShowLocale />
+  </Rook>
 );
 
 export default App;

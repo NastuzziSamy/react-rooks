@@ -1,33 +1,78 @@
-import * as React from 'react';
-import createRook from 'react-rooks';
+import * as React from "react";
+import { createRook } from "react-rooks";
 
-// Some global/stored values.
+enum Locale {
+  EN = "en",
+  FR = "fr",
+}
+
+// Simulate a translation file.
+const I18N_CONFIGS = {
+  locale: null as unknown as Locale,
+};
+const TRANSLATIONS = {
+  [Locale.EN]: {
+    page_title: "My React app",
+    greeting: "Hello, do you like React Rooks?",
+  },
+  [Locale.FR]: {
+    page_title: "Mon application React",
+    greeting: "Bonjour, aimez-vous React Rooks ?",
+  },
+};
+const i18n = {
+  changeLocale: (locale: Locale) => {
+    I18N_CONFIGS.locale = locale;
+  },
+  t: (key: string) => TRANSLATIONS[I18N_CONFIGS.locale][key],
+};
+
 export const [Rook, useRook] = createRook({
-    storedUser: {},
-    locale: 'en',
-    title: 'My React app',
-} as {
-    storedUser: { id?: string; name?: string; /* whatever */ };
-    locale: 'en' | 'fr';
-    title: string;
-}, {
-	locale: (locale, oldLocale) => {
-		console.log('locale changed from ' + oldLocale + ' to ' + locale);
-	}
+  defaultStore: {
+    lazy_title: "page_title",
+  },
+  init: (store) => {
+    // Set the initial locale. Here we defined the locale in the store.
+    // In a real app, you would probably get the locale from the browser or
+    // from a cookie.
+    i18n.changeLocale(Locale.EN);
+
+    return store as {
+      locale: Locale;
+      lazy_title: keyof (typeof TRANSLATIONS)[Locale.EN];
+    };
+  },
 });
 
 export const ChangeLocale = () => {
-	const [locale, setLocale] = useRook('locale');
+  const [locale, setLocale] = useRook("locale");
 
-	React.useEffect(() => setTimeout(() => setLocale(locale === 'en' ? 'fr' : 'en'), 2500), []);
+  /**
+   * Click on the buttons to change the locale.
+   */
+  return (
+    <div>
+      <button onClick={() => setLocale(Locale.EN)}>EN</button>
+      <button onClick={() => setLocale(Locale.FR)}>FR</button>
+    </div>
+  );
+};
 
-	return null;
+export const ShowLocale = () => {
+  const [locale] = useRook("locale");
+
+  return (
+    <div>
+      <h1>Current locale: {locale}</h1>
+    </div>
+  );
 };
 
 export const App = () => (
-	<Rook>
-		<ChangeLocale />
-	</Rook>
+  <Rook>
+    <ChangeLocale />
+    <ShowLocale />
+  </Rook>
 );
 
 export default App;

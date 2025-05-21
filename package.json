@@ -1,6 +1,6 @@
 {
   "name": "react-rooks",
-  "version": "1.5.2",
+  "version": "2.0.0",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
@@ -19,7 +19,11 @@
     "simple",
     "quick",
     "light",
-    "redux"
+    "redux",
+    "zustand",
+    "mobx",
+    "react-query",
+    "react-hooks"
   ],
   "author": "Samy NASTUZZI",
   "license": "MIT",
@@ -28,20 +32,21 @@
   },
   "homepage": "https://github.com/NastuzziSamy/react-rooks",
   "scripts": {
-    "build": "npm run build:esm && npm run build:cjs && npm run build:types",
+    "build": "bun run build:esm && bun run build:cjs && bun run build:types",
     "build:esm": "tsc --outDir dist/esm",
     "build:cjs": "tsc --outDir dist/cjs --module commonjs",
     "build:types": "tsc --outDir dist/types --declaration --emitDeclarationOnly",
-    "prepack": "npm run build"
+    "prepack": "bun run build"
   },
   "files": [
     "/dist"
   ],
   "devDependencies": {
-    "@types/react": "^17.0.39",
-    "typescript": "^4.5.5"
+    "@types/react": "^19.1.4"
   },
   "peerDependencies": {
-    "react": "^16.0.0 || ^17.0.0 || ^18.0.0"
+    "react": ">16.0.0",
+    "typescript": "^5.8.3",
+    "zod": "^3.24.4"
   }
 }

@@ -1,40 +1,61 @@
-import * as React from 'react';
-import createRook from 'react-rooks';
+import * as React from "react";
+import { createRook } from "react-rooks";
+
+enum Locale {
+  EN = "en",
+  FR = "fr",
+}
 
 // Some global/stored values.
-export const [Rook, useRook] = createRook({
-    storedUser: {},
-    locale: 'en',
-    title: 'My React app',
-} as {
-    storedUser: { id?: string; name?: string; /* whatever */ };
-    locale: 'en' | 'fr';
-    title: string;
+export const [Rook, useRook] = createRook<{
+  user: { id: number; name: string } | null;
+  locale: Locale;
+  title: string;
+}>({
+  defaultStore: {
+    user: null,
+    locale: Locale.EN,
+    title: "My React app",
+  },
 });
 
 export const ChangeLocale = () => {
-	const [locale, setLocale] = useRook('locale');
+  const [title, setTitle] = useRook("title");
+  const [user, setUser] = useRook("user");
 
-	React.useEffect(() => setTimeout(() => setLocale('fr'), 2500), []);
+  setUser({ id: 1, name: "John Doe" });
+  setUser(null);
+  setUser((prev: { id: number; name: string } | null) => ({
+    id: prev?.id ? prev.id + 1 : 1,
+    name: "Jane Doe",
+  }));
+  const [locale, setLocale] = useRook("locale");
+  const [store, setStore] = useRook();
 
-	return null;
+  React.useEffect(() => {
+    setTimeout(() => setLocale(Locale.FR), 2500);
+  }, []);
+
+  return null;
 };
 
 export const ShowLocale = () => {
-	const [locale] = useRook('locale');
+  const [locale] = useRook("locale");
 
-	// Log: 'en'.
-	// After 2.5s, log: 'fr'.
-	console.log(locale);
-
-	return null;
+  // Show: 'en'.
+  // After 2.5s, show: 'fr'.
+  return (
+    <div>
+      <h1>Current locale: {locale}</h1>
+    </div>
+  );
 };
 
 export const App = () => (
-	<Rook>
-		<ChangeLocale />
-		<ShowLocale />
-	</Rook>
+  <Rook>
+    <ChangeLocale />
+    <ShowLocale />
+  </Rook>
 );
 
 export default App;
