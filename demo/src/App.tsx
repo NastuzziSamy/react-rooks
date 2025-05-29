@@ -10,26 +10,26 @@ import ZodExample from "./examples/ZodExample";
 const examples = [
   {
     id: "classic",
-    title: "Exemple Classique",
-    description: "Utilisation basique de createRook avec store global",
+    title: "Classic Example",
+    description: "Basic usage of createRook with global store",
     component: ClassicExample,
   },
   {
     id: "contained",
-    title: "Exemple Contenu",
-    description: "Store avec scope limité aux composants enfants",
+    title: "Contained Example",
+    description: "Store with scope limited to child components",
     component: ContainedExample,
   },
   {
     id: "reduced",
-    title: "Exemple avec Reducers",
-    description: "Utilisation de createRook avec reducers et logique métier",
+    title: "Example with Reducers",
+    description: "Usage of createRook with reducers and business logic",
     component: ReducedExample,
   },
   {
     id: "zod",
-    title: "Exemple avec Zod",
-    description: "Validation de schéma avec createSchemedRook",
+    title: "Example with Zod",
+    description: "Schema validation with createSchemedRook",
     component: ZodExample,
   },
 ];
@@ -40,13 +40,13 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🎯 React Rooks - Démo Interactive</h1>
-        <p>Testez facilement les différents exemples de React Rooks</p>
+        <h1>🎯 React Rooks - Interactive Demo</h1>
+        <p>Easily test different React Rooks examples</p>
       </header>
 
       <div className="app-content">
         <nav className="sidebar">
-          <h2>Exemples</h2>
+          <h2>Examples</h2>
           <ul className="example-list">
             {examples.map((example) => (
               <li key={example.id}>

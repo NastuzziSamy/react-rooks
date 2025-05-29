@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createRook } from "react-rooks";
+import { createStoreRook } from "react-rooks";
 
 enum Locale {
   EN = "en",
@@ -7,16 +7,10 @@ enum Locale {
 }
 
 // Some global/stored values.
-export const [Rook, useRook] = createRook<{
-  user: { id: number; name: string } | null;
-  locale: Locale;
-  title: string;
-}>({
-  defaultStore: {
-    user: null,
-    locale: Locale.EN,
-    title: "My React app",
-  },
+export const [Rook, useRook] = createStoreRook({
+  user: null as { id: number; name: string } | null,
+  locale: Locale.EN,
+  title: "My React app",
 });
 
 export const ChangeLocale = () => {

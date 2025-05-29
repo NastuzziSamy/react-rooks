@@ -8,7 +8,7 @@ const Locale = {
 
 type LocaleType = (typeof Locale)[keyof typeof Locale];
 
-// Store contenu - chaque instance de Rook a son propre state
+// Contained store - each Rook instance has its own state
 const [Rook, useRook] = createRook<{
   user: { id: number; name: string } | null;
   locale: LocaleType;
@@ -18,7 +18,7 @@ const [Rook, useRook] = createRook<{
   defaultStore: {
     user: null,
     locale: Locale.EN,
-    title: "App Contendue",
+    title: "Contained App",
     messages: [],
   },
 });
@@ -27,7 +27,7 @@ const MessageManager = ({ instanceName }: { instanceName: string }) => {
   const [messages, setMessages] = useRook("messages");
 
   const addMessage = () => {
-    const newMessage = `Message ${messages.length + 1} de ${instanceName}`;
+    const newMessage = `Message ${messages.length + 1} from ${instanceName}`;
     setMessages([...messages, newMessage]);
   };
 
@@ -37,13 +37,13 @@ const MessageManager = ({ instanceName }: { instanceName: string }) => {
 
   return (
     <div className="demo-section">
-      <h4>💬 Messages pour {instanceName}</h4>
+      <h4>💬 Messages for {instanceName}</h4>
       <div className="demo-controls">
         <button className="demo-button" onClick={addMessage}>
-          Ajouter Message
+          Add Message
         </button>
         <button className="demo-button secondary" onClick={clearMessages}>
-          Vider
+          Clear
         </button>
       </div>
       <div className="demo-state">
@@ -65,7 +65,7 @@ const InstanceManager = ({ instanceName }: { instanceName: string }) => {
   const [locale, setLocale] = useRook("locale");
 
   const loginUser = () => {
-    setUser({ id: Date.now(), name: `Utilisateur ${instanceName}` });
+    setUser({ id: Date.now(), name: `User ${instanceName}` });
   };
 
   const logoutUser = () => {
@@ -74,13 +74,13 @@ const InstanceManager = ({ instanceName }: { instanceName: string }) => {
 
   return (
     <div className="demo-section">
-      <h4>👤 Utilisateur {instanceName}</h4>
+      <h4>👤 User {instanceName}</h4>
       <div className="demo-controls">
         <button className="demo-button" onClick={loginUser}>
-          Se connecter
+          Login
         </button>
         <button className="demo-button secondary" onClick={logoutUser}>
-          Se déconnecter
+          Logout
         </button>
         <div className="locale-buttons">
           <button
@@ -98,9 +98,9 @@ const InstanceManager = ({ instanceName }: { instanceName: string }) => {
         </div>
       </div>
       <div className="demo-state">
-        Utilisateur: {user ? user.name : "Non connecté"}
+        User: {user ? user.name : "Not logged in"}
         <br />
-        Langue: {locale.toUpperCase()}
+        Language: {locale.toUpperCase()}
       </div>
     </div>
   );
@@ -131,9 +131,9 @@ const ContainedExample = () => {
   return (
     <div className="example-demo">
       <div className="demo-info">
-        <strong>Exemple Contenu :</strong> Chaque composant{" "}
-        <code>&lt;Rook&gt;</code> maintient son propre état indépendant. Les
-        modifications dans une instance n'affectent pas les autres.
+        <strong>Contained Example:</strong> Each <code>&lt;Rook&gt;</code>{" "}
+        component maintains its own independent state. Changes in one instance
+        don't affect the others.
       </div>
 
       <div
@@ -148,9 +148,9 @@ const ContainedExample = () => {
       </div>
 
       <div className="demo-info" style={{ marginTop: "2rem" }}>
-        💡 Remarquez que chaque instance maintient son propre état utilisateur,
-        langue et messages. C'est idéal pour des composants réutilisables avec
-        leur propre logique d'état.
+        💡 Notice that each instance maintains its own user state, language and
+        messages. This is ideal for reusable components with their own state
+        logic.
       </div>
     </div>
   );

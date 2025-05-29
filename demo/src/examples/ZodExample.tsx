@@ -2,20 +2,20 @@ import React, { useState } from "react";
 import { createRook } from "react-rooks";
 import { z } from "zod";
 
-// Schémas de validation avec Zod
+// Validation schemas with Zod
 const UserSchema = z.object({
-  id: z.string().min(1, "L'ID est requis"),
-  name: z.string().min(2, "Le nom doit avoir au moins 2 caractères"),
-  email: z.string().email("Email invalide"),
+  id: z.string().min(1, "ID is required"),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email"),
   age: z
     .number()
-    .min(0, "L'âge doit être positif")
-    .max(120, "L'âge doit être réaliste"),
+    .min(0, "Age must be positive")
+    .max(120, "Age must be realistic"),
 });
 
 type User = z.infer<typeof UserSchema>;
 
-// Store avec types basiques (simulation de validation Zod)
+// Store with basic types (Zod validation simulation)
 const [Rook, useRook] = createRook<{
   user?: User;
   locale: "en" | "fr";
@@ -61,12 +61,12 @@ const UserForm = () => {
         age: parseInt(formData.age) || 0,
       };
 
-      // Validation avec Zod
+      // Zod validation
       const validatedUser = UserSchema.parse(userData);
       setUser(validatedUser);
       setValidationErrors([]);
 
-      // Reset du formulaire
+      // Reset form
       setFormData({ id: "", name: "", email: "", age: "" });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -82,7 +82,7 @@ const UserForm = () => {
 
   return (
     <div className="demo-section">
-      <h3>👤 Formulaire Utilisateur (Validation Zod)</h3>
+      <h3>👤 User Form (Zod Validation)</h3>
 
       <form onSubmit={handleSubmit} style={{ marginBottom: "1rem" }}>
         <div
@@ -107,7 +107,7 @@ const UserForm = () => {
           />
           <input
             type="text"
-            placeholder="Nom"
+            placeholder="Name"
             value={formData.name}
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, name: e.target.value }))
@@ -133,7 +133,7 @@ const UserForm = () => {
           />
           <input
             type="number"
-            placeholder="Âge"
+            placeholder="Age"
             value={formData.age}
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, age: e.target.value }))
@@ -148,21 +148,21 @@ const UserForm = () => {
 
         <div className="demo-controls" style={{ marginTop: "1rem" }}>
           <button type="submit" className="demo-button">
-            Enregistrer Utilisateur
+            Save User
           </button>
           <button
             type="button"
             className="demo-button secondary"
             onClick={clearUser}
           >
-            Effacer
+            Clear
           </button>
         </div>
       </form>
 
       {validationErrors.length > 0 && (
         <div className="error-display">
-          <strong>Erreurs de validation :</strong>
+          <strong>Validation errors:</strong>
           <ul style={{ margin: "0.5rem 0 0 0", paddingLeft: "1rem" }}>
             {validationErrors.map((error, idx) => (
               <li key={idx}>{error}</li>
@@ -172,10 +172,10 @@ const UserForm = () => {
       )}
 
       <div className="demo-state">
-        Utilisateur:{" "}
+        User:{" "}
         {user
-          ? `${user.name} (${user.email}, ${user.age} ans)`
-          : "Aucun utilisateur"}
+          ? `${user.name} (${user.email}, ${user.age} years old)`
+          : "No user"}
       </div>
     </div>
   );
@@ -226,7 +226,7 @@ const SettingsManager = () => {
 
   return (
     <div className="demo-section">
-      <h3>⚙️ Paramètres (Objets Imbriqués)</h3>
+      <h3>⚙️ Settings (Nested Objects)</h3>
 
       <div className="demo-controls">
         <button
@@ -266,7 +266,7 @@ const SettingsManager = () => {
             }}
           />
           <button className="demo-button" onClick={updateMaxItems}>
-            Mettre à jour
+            Update
           </button>
         </div>
         {validationError && (
@@ -290,7 +290,7 @@ const ItemsManager = () => {
     if (!newItem.trim()) return;
 
     if (items.length >= settings.maxItems) {
-      alert(`Maximum ${settings.maxItems} items autorisés`);
+      alert(`Maximum ${settings.maxItems} items allowed`);
       return;
     }
 
@@ -308,13 +308,13 @@ const ItemsManager = () => {
 
   return (
     <div className="demo-section">
-      <h3>📝 Liste d'Items (Tableaux)</h3>
+      <h3>📝 Items List (Arrays)</h3>
 
       <div style={{ marginBottom: "1rem" }}>
         <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem" }}>
           <input
             type="text"
-            placeholder="Nouvel item"
+            placeholder="New item"
             value={newItem}
             onChange={(e) => setNewItem(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && addItem()}
@@ -326,13 +326,13 @@ const ItemsManager = () => {
             }}
           />
           <button className="demo-button" onClick={addItem}>
-            Ajouter
+            Add
           </button>
         </div>
 
         <div className="demo-controls">
           <button className="demo-button secondary" onClick={clearAll}>
-            Tout effacer
+            Clear All
           </button>
         </div>
       </div>
@@ -369,7 +369,7 @@ const ItemsManager = () => {
             ))}
           </ul>
         ) : (
-          <div style={{ fontStyle: "italic", opacity: 0.7 }}>Aucun item</div>
+          <div style={{ fontStyle: "italic", opacity: 0.7 }}>No items</div>
         )}
       </div>
     </div>
@@ -382,7 +382,7 @@ const ThemeLocaleManager = () => {
 
   return (
     <div className="demo-section">
-      <h3>🎨 Thème et Langue (Enums)</h3>
+      <h3>🎨 Theme and Language (Enums)</h3>
 
       <div className="demo-controls">
         <div className="locale-buttons">
@@ -405,21 +405,21 @@ const ThemeLocaleManager = () => {
             className={`locale-button ${theme === "light" ? "active" : ""}`}
             onClick={() => setTheme("light")}
           >
-            🌞 Clair
+            🌞 Light
           </button>
           <button
             className={`locale-button ${theme === "dark" ? "active" : ""}`}
             onClick={() => setTheme("dark")}
           >
-            🌙 Sombre
+            🌙 Dark
           </button>
         </div>
       </div>
 
       <div className="demo-state">
-        Langue: {locale.toUpperCase()}
+        Language: {locale.toUpperCase()}
         <br />
-        Thème: {theme}
+        Theme: {theme}
       </div>
     </div>
   );
@@ -428,7 +428,7 @@ const ThemeLocaleManager = () => {
 const SchemaInfo = () => {
   return (
     <div className="demo-section">
-      <h3>📋 Schéma Zod Utilisé</h3>
+      <h3>📋 Zod Schema Used</h3>
       <div
         className="demo-state"
         style={{ fontSize: "0.8rem", lineHeight: "1.4" }}
@@ -454,9 +454,9 @@ const ZodExample = () => {
     <Rook>
       <div className="example-demo">
         <div className="demo-info">
-          <strong>Exemple avec Zod :</strong> Utilisation de{" "}
-          <code>createSchemedRook</code> pour la validation automatique des
-          données avec des schémas Zod. Tous les types sont inférés et validés.
+          <strong>Zod Example:</strong> Usage of <code>createSchemedRook</code>{" "}
+          for automatic data validation with Zod schemas. All types are inferred
+          and validated.
         </div>
 
         <UserForm />
@@ -466,8 +466,7 @@ const ZodExample = () => {
         <SchemaInfo />
 
         <div className="demo-info">
-          💡 Essayez de saisir des données invalides pour voir la validation en
-          action !
+          💡 Try entering invalid data to see validation in action!
         </div>
       </div>
     </Rook>

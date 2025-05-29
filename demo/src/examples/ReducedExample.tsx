@@ -8,9 +8,9 @@ const Locale = {
 
 type LocaleType = (typeof Locale)[keyof typeof Locale];
 
-// Simulation d'une API de traduction
+// Translation API simulation
 const I18N_CONFIGS = {
-  locale: Locale.FR as LocaleType, // Initialisé avec la valeur par défaut
+  locale: Locale.FR as LocaleType, // Initialized with default value
 };
 
 const TRANSLATIONS = {
@@ -51,7 +51,7 @@ const i18n = {
   },
 };
 
-// Store avec reducers simulés
+// Store with simulated reducers
 const [Rook, useRook] = createRook<{
   lazy_title: string;
   greeting_key: string;
@@ -63,23 +63,44 @@ const [Rook, useRook] = createRook<{
     lazy_title: "page_title",
     greeting_key: "greeting",
     user_count: 0,
-    last_action: "Initialisation",
+    last_action: "Initialization",
     locale: Locale.FR,
   },
   reducers: {
     locale: (newValue: LocaleType, oldValue: LocaleType) => {
-      // Reducer pour la langue - effectue des side effects
+      // Language reducer - performs side effects
       if (newValue !== oldValue) {
         i18n.changeLocale(newValue);
-        console.log(`🌍 Langue changée: ${oldValue} → ${newValue}`);
+        console.log(`🌍 Language changed: ${oldValue} → ${newValue}`);
       }
       return newValue;
     },
     user_count: (newValue: number, oldValue: number) => {
-      // Reducer pour le compteur d'utilisateurs
-      console.log(`👥 Nombre d'utilisateurs: ${oldValue} → ${newValue}`);
+      // User count reducer
+      console.log(`👥 User count: ${oldValue} → ${newValue}`);
       return newValue;
     },
+  },
+  storeReducer: (newValues, store) => {
+    // Store reducer - handles side effects and updates
+    if (newValues.lazy_title && newValues.lazy_title !== store.lazy_title) {
+      document.title = i18n.t(newValues.lazy_title);
+      console.log(
+        `📄 Title updated: ${store.lazy_title} → ${newValues.lazy_title}`
+      );
+      newValues.last_action = `Title changed to ${newValues.lazy_title}`;
+    } else if (newValues.locale && newValues.locale !== store.locale) {
+      document.title = i18n.t(store.lazy_title);
+      console.log(`🌍 Locale changed: ${store.locale} → ${newValues.locale}`);
+      newValues.last_action = `Locale changed to ${newValues.locale}`;
+    } else if (newValues.user_count !== undefined) {
+      console.log(
+        `👥 User count updated: ${store.user_count} → ${newValues.user_count}`
+      );
+      newValues.last_action = `User count changed to ${newValues.user_count}`;
+    }
+
+    return newValues;
   },
 });
 
@@ -88,7 +109,7 @@ const LanguageControls = () => {
 
   return (
     <div className="demo-section">
-      <h3>🌍 Contrôles de Langue (avec Reducer)</h3>
+      <h3>🌍 Language Controls (with Reducer)</h3>
       <div className="demo-controls">
         <div className="locale-buttons">
           <button
@@ -105,7 +126,7 @@ const LanguageControls = () => {
           </button>
         </div>
       </div>
-      <div className="demo-state">Langue actuelle: {locale.toUpperCase()}</div>
+      <div className="demo-state">Current language: {locale.toUpperCase()}</div>
     </div>
   );
 };
@@ -115,16 +136,16 @@ const TranslationDisplay = () => {
 
   return (
     <div className="demo-section">
-      <h3>💬 Traductions Dynamiques</h3>
+      <h3>💬 Dynamic Translations</h3>
       <div className="demo-state">
         <div>
-          <strong>Salutation:</strong> {i18n.t(greetingKey)}
+          <strong>Greeting:</strong> {i18n.t(greetingKey)}
         </div>
         <div>
-          <strong>Bienvenue:</strong> {i18n.t("welcome")}
+          <strong>Welcome:</strong> {i18n.t("welcome")}
         </div>
         <div>
-          <strong>Au revoir:</strong> {i18n.t("goodbye")}
+          <strong>Goodbye:</strong> {i18n.t("goodbye")}
         </div>
       </div>
     </div>
@@ -138,7 +159,7 @@ const TitleManager = () => {
 
   return (
     <div className="demo-section">
-      <h3>📄 Gestion du Titre (avec Store Reducer)</h3>
+      <h3>📄 Title Management (with Store Reducer)</h3>
       <div className="demo-controls">
         {titleOptions.map((title) => (
           <button
@@ -151,12 +172,12 @@ const TitleManager = () => {
         ))}
       </div>
       <div className="demo-state">
-        Clé du titre: {lazyTitle}
+        Title key: {lazyTitle}
         <br />
-        Titre traduit: {i18n.t(lazyTitle)}
+        Translated title: {i18n.t(lazyTitle)}
       </div>
       <div className="demo-info">
-        💡 Le titre de l'onglet du navigateur se met à jour automatiquement
+        💡 The browser tab title updates automatically
       </div>
     </div>
   );
@@ -171,23 +192,23 @@ const UserCounter = () => {
 
   return (
     <div className="demo-section">
-      <h3>👥 Compteur d'Utilisateurs (avec Reducer)</h3>
+      <h3>👥 User Counter (with Reducer)</h3>
       <div className="demo-controls">
         <button className="demo-button" onClick={addUser}>
-          + Utilisateur
+          + User
         </button>
         <button
           className="demo-button"
           onClick={removeUser}
           disabled={userCount === 0}
         >
-          - Utilisateur
+          - User
         </button>
         <button className="demo-button secondary" onClick={resetUsers}>
           Reset
         </button>
       </div>
-      <div className="demo-state">Nombre d'utilisateurs: {userCount}</div>
+      <div className="demo-state">User count: {userCount}</div>
     </div>
   );
 };
@@ -197,7 +218,7 @@ const ActionLogger = () => {
 
   return (
     <div className="demo-section">
-      <h3>📝 Dernière Action (Store Reducer)</h3>
+      <h3>📝 Last Action (Store Reducer)</h3>
       <div className="status-display">{lastAction}</div>
     </div>
   );
@@ -208,7 +229,7 @@ const CompleteState = () => {
 
   return (
     <div className="demo-section">
-      <h3>📊 État Complet du Store</h3>
+      <h3>📊 Complete Store State</h3>
       <div className="demo-state">{JSON.stringify(store, null, 2)}</div>
     </div>
   );
@@ -219,9 +240,8 @@ const ReducedExample = () => {
     <Rook>
       <div className="example-demo">
         <div className="demo-info">
-          <strong>Exemple avec Reducers :</strong> Utilisation de{" "}
-          <code>createRook</code> avec des reducers pour la logique métier et
-          les effets de bord.
+          <strong>Example with Reducers:</strong> Using <code>createRook</code>{" "}
+          with reducers for business logic and side effects.
         </div>
 
         <LanguageControls />
@@ -232,7 +252,7 @@ const ReducedExample = () => {
         <CompleteState />
 
         <div className="demo-info">
-          💡 Ouvrez la console pour voir les logs des reducers en action !
+          💡 Open the console to see the reducer logs in action!
         </div>
       </div>
     </Rook>

@@ -6,12 +6,12 @@ const Locale = {
   FR: "fr",
 } as const;
 
-// Store global avec createRook
+// Global store with createRook
 const [Rook, useRook] = createRook({
   defaultStore: {
     user: null as { id: number; name: string } | null,
     locale: Locale.EN,
-    title: "Mon App React",
+    title: "My React App",
     counter: 0,
   },
 });
@@ -35,24 +35,24 @@ const UserManager = () => {
 
   return (
     <div className="demo-section">
-      <h3>👤 Gestion Utilisateur</h3>
+      <h3>👤 User Management</h3>
       <div className="demo-controls">
         <button className="demo-button" onClick={loginUser}>
-          Se connecter
+          Login
         </button>
         <button className="demo-button secondary" onClick={logoutUser}>
-          Se déconnecter
+          Logout
         </button>
         <button
           className="demo-button secondary"
           onClick={updateUser}
           disabled={!user}
         >
-          Changer nom
+          Change name
         </button>
       </div>
       <div className="demo-state">
-        Utilisateur: {user ? `${user.name} (ID: ${user.id})` : "Non connecté"}
+        User: {user ? `${user.name} (ID: ${user.id})` : "Not logged in"}
       </div>
     </div>
   );
@@ -62,7 +62,7 @@ const LocaleManager = () => {
   const [locale, setLocale] = useRook("locale");
 
   useEffect(() => {
-    // Simulation d'un changement automatique après 5 secondes
+    // Simulate automatic change after 5 seconds
     const timer = setTimeout(() => {
       setLocale(locale === Locale.EN ? Locale.FR : Locale.EN);
     }, 5000);
@@ -72,7 +72,7 @@ const LocaleManager = () => {
 
   return (
     <div className="demo-section">
-      <h3>🌍 Langue</h3>
+      <h3>🌍 Language</h3>
       <div className="demo-controls">
         <div className="locale-buttons">
           <button
@@ -89,9 +89,9 @@ const LocaleManager = () => {
           </button>
         </div>
       </div>
-      <div className="demo-state">Langue actuelle: {locale.toUpperCase()}</div>
+      <div className="demo-state">Current language: {locale.toUpperCase()}</div>
       <div className="demo-info">
-        💡 La langue change automatiquement toutes les 5 secondes
+        💡 Language changes automatically every 5 seconds
       </div>
     </div>
   );
@@ -106,7 +106,7 @@ const Counter = () => {
 
   return (
     <div className="demo-section">
-      <h3>🔢 Compteur Global</h3>
+      <h3>🔢 Global Counter</h3>
       <div className="demo-controls">
         <button className="demo-button" onClick={increment}>
           + 1
@@ -118,7 +118,7 @@ const Counter = () => {
           Reset
         </button>
       </div>
-      <div className="demo-state">Compteur: {counter}</div>
+      <div className="demo-state">Counter: {counter}</div>
     </div>
   );
 };
@@ -128,7 +128,7 @@ const StoreDisplay = () => {
 
   return (
     <div className="demo-section">
-      <h3>📊 État Complet du Store</h3>
+      <h3>📊 Complete Store State</h3>
       <div className="demo-state">{JSON.stringify(store, null, 2)}</div>
     </div>
   );
@@ -139,9 +139,9 @@ const ClassicExample = () => {
     <Rook>
       <div className="example-demo">
         <div className="demo-info">
-          <strong>Exemple Classique :</strong> Utilisation de{" "}
-          <code>createRook</code> pour créer un store global simple. Tous les
-          composants peuvent accéder et modifier l'état partagé.
+          <strong>Classic Example:</strong> Using <code>createRook</code> to
+          create a simple global store. All components can access and modify the
+          shared state.
         </div>
 
         <UserManager />

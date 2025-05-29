@@ -128,3 +128,25 @@ export const createRook = <
 
   return [CreatedRook, useRook];
 };
+
+export const createStoreRook = <Store extends RookStore>(
+  defaultStore: Store,
+  {
+    reducers,
+    storeReducer,
+  }: {
+    reducers?: RookReducers<Store>;
+    storeReducer?: RookStoreReducer<Store>;
+  } = {}
+): [
+  RookComponent,
+  <StoreKey extends keyof Store | undefined = undefined>(
+    key?: StoreKey
+  ) => UseStoreHookReturn<Store, StoreKey>
+] => {
+  return createRook<Store, Store>({
+    defaultStore,
+    reducers,
+    storeReducer,
+  });
+};
