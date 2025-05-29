@@ -9,7 +9,6 @@ import type {
   RookInit,
   RookStoreReducer,
   RookReducers,
-  RookProps,
   RookComponent,
 } from "./type";
 
@@ -55,27 +54,45 @@ export const createUseRook =
     return [store[key], setValue] as UseStoreHookReturn<Store, StoreKey>;
   };
 
+// Helper function for better type inference when using init
+export function createRookWithInit<
+  DefaultStore extends RookStore,
+  Store extends RookStore
+>(config: {
+  defaultStore: DefaultStore;
+  init: (store: DefaultStore) => Promise<Store>;
+  storeReducer?: RookStoreReducer<Store>;
+  reducers?: RookReducers<Store>;
+}): [
+  RookComponent,
+  <StoreKey extends keyof Store | undefined = undefined>(
+    key?: StoreKey
+  ) => UseStoreHookReturn<Store, StoreKey>
+] {
+  return createRook<Store, DefaultStore>(config);
+}
+
 export const createRook = <
   Store extends RookStore,
-  DefaultStore extends Partial<Store>
+  DefaultStore extends RookStore = Store
 >({
   defaultStore,
   init,
   storeReducer,
   reducers,
-}: {
-  storeReducer?: RookStoreReducer<Store>;
-  reducers?: RookReducers<Store>;
-} & (
+}:
   | {
       init: RookInit<Store, DefaultStore>;
       defaultStore?: DefaultStore;
+      storeReducer?: RookStoreReducer<Store>;
+      reducers?: RookReducers<Store>;
     }
   | {
       init?: undefined;
       defaultStore: Store;
-    }
-)): [
+      storeReducer?: RookStoreReducer<Store>;
+      reducers?: RookReducers<Store>;
+    }): [
   RookComponent,
   <StoreKey extends keyof Store | undefined = undefined>(
     key?: StoreKey
@@ -86,19 +103,27 @@ export const createRook = <
   const CreatedRook = ({
     // onInit,
     children,
-  }: RookProps<Store>) => (
-    <Rook
-      Provider={context.Provider}
-      storeReducer={storeReducer}
-      reducers={reducers}
-      {...({
-        defaultStore,
-        init,
-      } as { defaultStore: Store; init?: undefined })} // Type assertion to ensure TypeScript knows the value exists
-    >
-      {children}
-    </Rook>
-  );
+  }: React.PropsWithChildren) =>
+    init ? (
+      <Rook<Store, DefaultStore>
+        Provider={context.Provider}
+        storeReducer={storeReducer}
+        reducers={reducers}
+        init={init}
+        defaultStore={defaultStore as DefaultStore}
+      >
+        {children}
+      </Rook>
+    ) : (
+      <Rook<Store, Store>
+        Provider={context.Provider}
+        storeReducer={storeReducer}
+        reducers={reducers}
+        defaultStore={defaultStore as Store}
+      >
+        {children}
+      </Rook>
+    );
 
   const useRook = createUseRook<Store>(context);
 

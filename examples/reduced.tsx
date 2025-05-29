@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createRook } from "react-rooks";
+import { createRookWithInit } from "react-rooks";
 
 enum Locale {
   EN = "en",
@@ -27,20 +27,38 @@ const i18n = {
   t: (key: string) => TRANSLATIONS[I18N_CONFIGS.locale][key],
 };
 
-export const [Rook, useRook] = createRook({
+export const [Rook, useRook] = createRookWithInit({
   defaultStore: {
-    lazy_title: "page_title",
+    lazy_title: "page_title" as keyof (typeof TRANSLATIONS)[Locale.EN],
   },
-  init: (store) => {
+  init: async (store) => {
     // Set the initial locale. Here we defined the locale in the store.
     // In a real app, you would probably get the locale from the browser or
     // from a cookie.
     i18n.changeLocale(Locale.EN);
 
-    return store as {
-      locale: Locale;
-      lazy_title: keyof (typeof TRANSLATIONS)[Locale.EN];
+    return {
+      ...store,
+      locale: Locale.EN,
     };
+  },
+  reducers: {
+    locale: (newValue, oldValue) => {
+      // If the locale is the same, we do nothing.
+      if (newValue !== oldValue) {
+        i18n.changeLocale(newValue);
+      }
+
+      return newValue;
+    },
+  },
+  storeReducer: (values, store) => {
+    // If the lazy_title is changed, we update the title.
+    if (values.lazy_title && values.lazy_title !== store.lazy_title) {
+      document.title = i18n.t(values.lazy_title);
+    }
+
+    return values;
   },
 });
 

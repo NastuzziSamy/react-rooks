@@ -1,14 +1,17 @@
 import * as React from "react";
 import { RookStore, RookState, RookProps } from "./type";
 
-export const Rook = <Store extends RookStore>({
+export const Rook = <
+  Store extends RookStore,
+  DefaultStore extends RookStore = Store
+>({
   defaultStore,
   init,
   storeReducer,
   reducers,
   Provider,
   children,
-}: RookProps<Store>) => {
+}: RookProps<Store, DefaultStore>) => {
   const [rookState, setRookState] = React.useState<RookState<Store>>({
     inited: false,
     store: null,
@@ -63,17 +66,21 @@ export const Rook = <Store extends RookStore>({
   );
 
   React.useEffect(() => {
-    if (init) {
-      setRookState({
-        inited: true,
-        store: init({ ...defaultStore }),
-      });
-    } else {
-      setRookState({
-        inited: true,
-        store: { ...defaultStore },
-      });
-    }
+    (async () => {
+      if (init) {
+        setRookState({
+          inited: true,
+          store: defaultStore
+            ? await init(defaultStore as DefaultStore)
+            : await init({} as DefaultStore),
+        });
+      } else {
+        setRookState({
+          inited: true,
+          store: defaultStore as Store,
+        });
+      }
+    })();
   }, []);
 
   if (rookState.store) {
