@@ -36,7 +36,9 @@
     "build:esm": "tsc --outDir dist/esm",
     "build:cjs": "tsc --outDir dist/cjs --module commonjs",
     "build:types": "tsc --outDir dist/types --declaration --emitDeclarationOnly",
-    "prepack": "bun run build"
+    "prepack": "bun run build",
+    "demo": "cd demo && npm install && npm run dev",
+    "demo:build": "cd demo && npm install && npm run build"
   },
   "files": [
     "/dist"

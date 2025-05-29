@@ -36,19 +36,18 @@ export const createUseRook =
           prev: Store[Extract<StoreKey, keyof Store>]
         ) => Store[Extract<StoreKey, keyof Store>];
 
-        update((prev: Store[Extract<StoreKey, keyof Store>]) => ({
-          ...prev,
+        update({
           [key]: transformValue(
-            prev[key] as Store[Extract<StoreKey, keyof Store>]
+            store[key] as Store[Extract<StoreKey, keyof Store>]
           ),
-        }));
+        } as unknown as Partial<Store>);
 
         return;
       }
 
       update({
         [key]: value,
-      });
+      } as unknown as Partial<Store>);
     };
 
     return [store[key], setValue] as UseStoreHookReturn<Store, StoreKey>;

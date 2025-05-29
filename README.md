@@ -4,6 +4,7 @@ Many packages exist for store management.
 Why shoud you use this new one ?
 
 Are you searching for :
+
 - hook driven management ?
 - simple stores ?
 - multiple stores ?
@@ -16,14 +17,35 @@ Are you searching for :
 
 Here you'll find everything you need.
 
+## 🎯 Démo Interactive
+
+Explorez React Rooks avec notre démo interactive qui présente tous les cas d'usage :
+
+```bash
+# Lancer la démo
+npm run demo
+
+# Ou utiliser le script
+./start-demo.sh
+```
+
+La démo inclut :
+
+- 🏷️ **Exemple Classique** : Store global simple avec `createRook`
+- 🏠 **Exemple Contenu** : Stores indépendants pour composants réutilisables
+- ⚡ **Exemple avec Reducers** : Logique avancée avec `createRookWithInit`
+- ✅ **Exemple avec Zod** : Validation de schéma avec `createSchemedRook`
+
 ## Install
 
 With lovely yarn:
+
 ```bash
 yarn add react-rooks
 ```
 
 or with npm:
+
 ```bash
 npm install react-rooks
 ```
@@ -33,22 +55,24 @@ npm install react-rooks
 # First, create a rook store
 
 `rook.ts`:
+
 ```typescript
-import createRook from 'react-rooks';
+import createRook from "react-rooks";
 
 // Some global/stored values.
 export const [Rook, useRook] = createRook({
-    storedUser: {},
-    locale: 'en',
-    title: 'My React app',
+  storedUser: {},
+  locale: "en",
+  title: "My React app",
 } as {
-    storedUser: { id?: string; name?: string; /* whatever */ };
-    locale: 'en' | 'fr';
-    title: string;
+  storedUser: { id?: string; name?: string /* whatever */ };
+  locale: "en" | "fr";
+  title: string;
 });
 ```
 
 `createRook` takes two arguments:
+
 - `store` (`Record<string, any>`): your stored object
 - `reducers`: one or more reducers for your store. Reducers can either be:
   - an object where each key is a key of `store` and each value is a `reducer` ;
@@ -59,6 +83,7 @@ A `reducer` takes two arguments: the new value, and the last value. It must retu
 ### Example of reducer
 
 If you want to change your window title, you can reduce the changed title value:
+
 ```typescript
 import createRook from 'react-rooks';
 
@@ -80,12 +105,14 @@ export const [Rook, useRook] = createRook({ ... }, {
 ### Returns
 
 As you can see, `createRook` returns an array:
+
 - `Rook` is the context of your store. You must add it before using the hook `useRook` in your components. `Rook` can be nested, with a duplicated nested store.
 - `useRook` is a hook, that retrieve the current store an is similar to `React.useState`.
 
 ### Usage with multiple rooks!
 
 Instead of nesting your rooks, you can contain them all together:
+
 ```typescript
 // From:
 export const App = () => (
@@ -111,33 +138,34 @@ export const App = () => (
 # Then, use it!
 
 `App.tsx`:
+
 ```typescript
-import * as React from 'react';
-import { Rook, useRook } from './rook';
+import * as React from "react";
+import { Rook, useRook } from "./rook";
 
 export const ChangeLocale = () => {
-	const [locale, setLocale] = useRook('locale');
+  const [locale, setLocale] = useRook("locale");
 
-	React.useEffect(() => setTimeout(() => setLocale('fr'), 2500), []);
+  React.useEffect(() => setTimeout(() => setLocale("fr"), 2500), []);
 
-	return null;
+  return null;
 };
 
 export const ShowLocale = () => {
-	const [locale] = useRook('locale');
+  const [locale] = useRook("locale");
 
-	// Log: 'en'.
-	// After 2.5s, log: 'fr'.
-	console.log(locale);
+  // Log: 'en'.
+  // After 2.5s, log: 'fr'.
+  console.log(locale);
 
-	return null;
+  return null;
 };
 
 export const App = () => (
-	<Rook>
-		<ChangeLocale />
-		<ShowLocale />
-	</Rook>
+  <Rook>
+    <ChangeLocale />
+    <ShowLocale />
+  </Rook>
 );
 
 export default App;

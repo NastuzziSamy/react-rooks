@@ -7,12 +7,8 @@ enum Locale {
 }
 
 // Some global/stored values.
-export const [Rook, useRook] = createRook<{
-  user: { id: number; name: string } | null;
-  locale: Locale;
-  title: string;
-}>({
-  user: null,
+export const [Rook, useRook] = createRook({
+  user: null as ({ id: number; name: string } | null),
   locale: Locale.EN,
   title: "My React app",
 });
@@ -23,7 +19,7 @@ export const ChangeLocale = () => {
 
   setUser({ id: 1, name: "John Doe" });
   setUser(null);
-  setUser((prev: { id: number; name: string } | null) => ({
+  setUser((prev: ) => ({
     id: prev?.id ? prev.id + 1 : 1,
     name: "Jane Doe",
   }));

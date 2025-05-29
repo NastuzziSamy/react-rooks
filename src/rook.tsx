@@ -17,13 +17,9 @@ export const Rook = <
     store: null,
   });
 
-  const reduceValues = (values: Partial<Store>) => {
-    if (!rookState.inited) {
-      return values;
-    }
-
+  const reduceValues = (values: Partial<Store>, currentStore: Store) => {
     if (storeReducer) {
-      values = storeReducer(values, rookState.store);
+      values = storeReducer(values, currentStore);
     }
 
     if (!reducers) {
@@ -39,7 +35,7 @@ export const Rook = <
       // Type assertion to ensure TypeScript knows the value exists
       values[name] = reducer(
         values[name] as Store[Extract<keyof Store, string>],
-        rookState.store[name]
+        currentStore[name]
       );
     }
 
@@ -48,21 +44,25 @@ export const Rook = <
 
   const updateStore = React.useCallback(
     (values: Store, reduce = true) => {
-      if (!rookState.inited) {
-        return;
-      }
+      setRookState((currentState) => {
+        if (!currentState.inited) {
+          return currentState;
+        }
 
-      const reducedValues = reduce ? reduceValues(values) : values;
+        const reducedValues = reduce
+          ? reduceValues(values, currentState.store)
+          : values;
 
-      setRookState({
-        store: {
-          ...rookState.store,
-          ...reducedValues,
-        },
-        inited: true,
+        return {
+          store: {
+            ...currentState.store,
+            ...reducedValues,
+          },
+          inited: true,
+        };
       });
     },
-    [setRookState]
+    [storeReducer, reducers]
   );
 
   React.useEffect(() => {
@@ -83,12 +83,8 @@ export const Rook = <
     })();
   }, []);
 
-  if (rookState.store) {
-    return;
-  }
-
   if (!rookState.inited) {
-    return;
+    return null;
   }
 
   return (
