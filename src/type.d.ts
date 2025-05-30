@@ -1,14 +1,16 @@
 type ValueOf<T> = T extends Record<string, infer U> ? U : never;
 
-export type RookStore = { [key: string]: any };
-export type RookStoreData<
-  Store extends RookStore,
-  Key
-> = Key extends keyof Store ? Store[Key] : Store;
+export type RookStore = Record<string, any>;
+export type RookStoreData<Store extends RookStore, Key> = Key extends Extract<
+  keyof Store,
+  string
+>
+  ? Store[Key]
+  : Store;
 
 export type RookContextValue<Store extends RookStore> = {
   store: Store;
-  update: CallableFunction;
+  update: (values: Partial<Store> | ((prev: Store) => Partial<Store>)) => void;
 };
 export type RookContext<Store extends RookStore> = React.Context<
   RookContextValue<Store>
@@ -44,37 +46,36 @@ export type RookStoreReducer<Store extends RookStore> = (
 export type RookReducer<
   Store extends RookStore,
   Key extends Extract<keyof Store, string>
-> = <Value extends Store[Key]>(newValue: Value, oldValue: Value) => Value;
+> = (newValue: Store[Key], oldValue: Store[Key]) => Store[Key];
 
 export type RookReducers<Store extends RookStore> = Partial<{
-  [key in Extract<keyof Store, string>]: RookReducer<Store, key>;
+  [Key in Extract<keyof Store, string>]: (
+    newValue: Store[Key],
+    oldValue: Store[Key]
+  ) => Store[Key];
 }>;
 
 export type RookProps<
   Store extends RookStore,
   DefaultStore extends RookStore
-> =
-  | {
-      init: RookInit<Store, DefaultStore>;
-      defaultStore?: DefaultStore | undefined;
-      storeReducer?: RookStoreReducer<Store> | undefined;
-      reducers?: RookReducers<Store> | undefined;
-      Provider: RookContext<Store>["Provider"];
-      children: React.ReactNode;
-    }
-  | {
-      init?: undefined;
-      defaultStore: Store;
-      storeReducer?: RookStoreReducer<Store> | undefined;
-      reducers?: RookReducers<Store> | undefined;
-      Provider: RookContext<Store>["Provider"];
-      children: React.ReactNode;
-    };
+> = {
+  init: RookInit<Store, DefaultStore>;
+  defaultStore: DefaultStore;
+  storeReducer?: RookStoreReducer<Store> | undefined;
+  reducers?: RookReducers<Store> | undefined;
+  Provider: RookContext<Store>["Provider"];
+  children: React.ReactNode;
+};
 
 export type UseStoreHookReturn<
   Store extends RookStore,
   StoreKey extends keyof Store | undefined
-> = StoreKey extends keyof Store
+> = StoreKey extends undefined
+  ? [
+      Store,
+      (values: Partial<Store> | ((prev: Store) => Partial<Store>)) => void
+    ]
+  : StoreKey extends keyof Store
   ? [
       Store[StoreKey],
       (
@@ -85,7 +86,4 @@ export type UseStoreHookReturn<
             ) => Store[Extract<StoreKey, keyof Store>])
       ) => void
     ]
-  : [
-      Store,
-      (values: Partial<Store> | ((prev: Store) => Partial<Store>)) => void
-    ];
+  : never;

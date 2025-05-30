@@ -43,15 +43,17 @@ export const Rook = <
   };
 
   const updateStore = React.useCallback(
-    (values: Store, reduce = true) => {
+    (values: Partial<Store> | ((prev: Store) => Partial<Store>)) => {
       setRookState((currentState) => {
         if (!currentState.inited) {
           return currentState;
         }
 
-        const reducedValues = reduce
-          ? reduceValues(values, currentState.store)
-          : values;
+        // Si values est une fonction, l'appeler avec le store actuel
+        const valuesToApply =
+          typeof values === "function" ? values(currentState.store) : values;
+
+        const reducedValues = reduceValues(valuesToApply, currentState.store);
 
         return {
           store: {
@@ -67,19 +69,10 @@ export const Rook = <
 
   React.useEffect(() => {
     (async () => {
-      if (init) {
-        setRookState({
-          inited: true,
-          store: defaultStore
-            ? await init(defaultStore as DefaultStore)
-            : await init({} as DefaultStore),
-        });
-      } else {
-        setRookState({
-          inited: true,
-          store: defaultStore as Store,
-        });
-      }
+      setRookState({
+        inited: true,
+        store: await init(defaultStore as DefaultStore),
+      });
     })();
   }, []);
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { createRook, RookContainer } from "../src";
+import { createRook, RookContainer } from "react-rooks";
 
 // Store hiérarchique: User → Theme → Cart
 const [UserStore, useUser] = createRook({

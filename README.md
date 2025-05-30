@@ -46,9 +46,18 @@
 ### Installation
 
 ```bash
-npm install react-rooks
+# Using bun (recommended)
+bun add react-rooks
 # Optional: for validation features
+bun add zod
+
+# Using npm
+npm install react-rooks
 npm install zod
+
+# Using yarn
+yarn add react-rooks
+yarn add zod
 ```
 
 ### Basic Usage (Global Store)
@@ -120,6 +129,85 @@ function Counter() {
 
 ---
 
+## 🔧 Zod Integration (Optional)
+
+React Rooks provides optional Zod integration for schema validation. To keep the main bundle lightweight, Zod features are available through a separate import path.
+
+### Installation
+
+```bash
+# Using bun (recommended)
+bun add react-rooks zod
+
+# Using npm
+npm install react-rooks zod
+
+# Using yarn
+yarn add react-rooks zod
+```
+
+### Import Structure
+
+```tsx
+// Main package (lightweight, no Zod dependency)
+import { createRook, RookContainer } from "react-rooks";
+
+// Zod integration (requires zod as dependency)
+import { createZodRook } from "react-rooks/zod";
+import { z } from "zod";
+```
+
+### Basic Zod Usage
+
+```tsx
+import { createZodRook } from "react-rooks/zod";
+import { z } from "zod";
+
+// Define your schema with defaults
+const UserSchema = z.object({
+  name: z.string().default(""),
+  email: z.string().email().default(""),
+  age: z.number().min(0).max(120).default(0),
+  isActive: z.boolean().default(true),
+});
+
+// Create store with automatic validation
+const [UserStore, useUser] = createZodRook({
+  schema: UserSchema,
+  onValidationError: (error) => console.error("Validation failed:", error),
+});
+
+function UserForm() {
+  const [user, updateUser] = useUser();
+
+  return (
+    <UserStore>
+      <input
+        value={user.name}
+        onChange={(e) => updateUser({ name: e.target.value })}
+        placeholder="Name"
+      />
+      <input
+        type="email"
+        value={user.email}
+        onChange={(e) => updateUser({ email: e.target.value })}
+        placeholder="Email"
+      />
+      {/* Validation happens automatically */}
+    </UserStore>
+  );
+}
+```
+
+### Why Separate Import?
+
+- **🪶 Keeps main bundle lightweight**: Zod is only included when you use `react-rooks/zod`
+- **📦 Optional dependency**: You can use React Rooks without installing Zod
+- **🌳 Better tree-shaking**: Bundlers can easily exclude Zod code when not used
+- **🔧 Clear separation of concerns**: Validation features are explicitly opt-in
+
+---
+
 ## 📋 Complete API Reference
 
 ### `createRook(initialStore, reducers?)`
@@ -151,17 +239,6 @@ const [Store, useStore] = createRook(
     },
   }
 );
-```
-
-### `createRookWithInit(initFunction, reducers?)`
-
-Creates a store with lazy initialization.
-
-```tsx
-const [Store, useStore] = createRookWithInit(() => ({
-  user: JSON.parse(localStorage.getItem("user") || "{}"),
-  settings: loadUserSettings(),
-}));
 ```
 
 ### `createZodRook(options)`
@@ -725,8 +802,18 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ```bash
 git clone https://github.com/your-username/react-rooks.git
 cd react-rooks
+
+# Using bun (recommended)
+bun install
+bun run dev
+
+# Using npm
 npm install
 npm run dev
+
+# Using yarn
+yarn install
+yarn dev
 ```
 
 ---

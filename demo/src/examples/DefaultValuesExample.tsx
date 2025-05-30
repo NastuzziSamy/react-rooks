@@ -1,5 +1,5 @@
 import React from "react";
-import { createZodRook } from "react-rooks";
+import { createZodRook } from "react-rooks/zod";
 import { z } from "zod";
 
 // Schéma avec valeurs par défaut uniquement

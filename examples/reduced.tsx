@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createRookWithInit } from "react-rooks";
+import { createRook } from "react-rooks";
 
 enum Locale {
   EN = "en",
@@ -27,8 +27,9 @@ const i18n = {
   t: (key: string) => TRANSLATIONS[I18N_CONFIGS.locale][key],
 };
 
-export const [Rook, useRook] = createRookWithInit({
+export const [Rook, useRook] = createRook({
   defaultStore: {
+    user: null as { id: number; name: string } | null,
     lazy_title: "page_title" as keyof (typeof TRANSLATIONS)[Locale.EN],
   },
   init: async (store) => {
@@ -39,10 +40,14 @@ export const [Rook, useRook] = createRookWithInit({
 
     return {
       ...store,
-      locale: Locale.EN,
+      locale: Locale.EN as Locale,
     };
   },
   reducers: {
+    lazy_title: (newValue, oldValue) => {
+      // If the lazy_title is the same, we do nothing.
+      return newValue;
+    },
     locale: (newValue, oldValue) => {
       // If the locale is the same, we do nothing.
       if (newValue !== oldValue) {
@@ -86,10 +91,24 @@ export const ShowLocale = () => {
   );
 };
 
+export const ShowStore = () => {
+  const [store] = useRook();
+
+  return (
+    <div>
+      <h2>Store:</h2>
+      <pre>{JSON.stringify(store, null, 2)}</pre>
+      <h2>Lazy title:</h2>
+      <p>{i18n.t(store.lazy_title)}</p>
+    </div>
+  );
+};
+
 export const App = () => (
   <Rook>
     <ChangeLocale />
     <ShowLocale />
+    <ShowStore />
   </Rook>
 );
 

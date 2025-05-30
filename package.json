@@ -4,6 +4,18 @@
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./zod": {
+      "types": "./dist/types/index-zod.d.ts",
+      "import": "./dist/esm/index-zod.js",
+      "require": "./dist/cjs/index-zod.js"
+    }
+  },
   "description": "Store management for React and React Native with simple hooks !",
   "repository": {
     "type": "git",
@@ -48,7 +60,14 @@
   },
   "peerDependencies": {
     "react": ">16.0.0",
-    "typescript": "^5.8.3",
+    "typescript": "^5.8.3"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": true
+    }
+  },
+  "optionalDependencies": {
     "zod": "^3.24.4"
   }
 }

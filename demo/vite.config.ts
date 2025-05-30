@@ -8,9 +8,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "react-rooks": path.resolve(__dirname, "../index.tsx"),
+      "react-rooks/zod": path.resolve(__dirname, "../index-zod.tsx"),
     },
   },
   optimizeDeps: {
-    exclude: ["react-rooks"],
+    exclude: ["react-rooks", "react-rooks/zod"],
   },
 });

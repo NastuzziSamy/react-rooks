@@ -17,12 +17,23 @@ export const ChangeLocale = () => {
   const [title, setTitle] = useRook("title");
   const [user, setUser] = useRook("user");
 
+  // Test des types - ces lignes devraient compiler sans erreur
+  // user devrait être: { id: number; name: string } | null
+  // title devrait être: string
+  // locale devrait être: Locale
+
   setUser({ id: 1, name: "John Doe" });
   setUser(null);
-  setUser((prev: { id: number; name: string } | null) => ({
+  setUser((prev) => ({
     id: prev?.id ? prev.id + 1 : 1,
     name: "Jane Doe",
   }));
+
+  // Test de type: user peut être null
+  if (user) {
+    console.log(user.id, user.name); // user.id et user.name devraient être disponibles
+  }
+
   const [locale, setLocale] = useRook("locale");
   const [store, setStore] = useRook();
 

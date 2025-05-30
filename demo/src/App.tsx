@@ -9,6 +9,9 @@ import ZodExample from "./examples/ZodExample";
 import ZodRookExample from "./examples/ZodRookExample";
 import DefaultValuesExample from "./examples/DefaultValuesExample";
 import RookContainerExample from "./examples/RookContainerExample";
+import SimpleZodExample from "./examples/SimpleZodExample";
+import ZodWithInitExample from "./examples/ZodWithInitExample";
+import ImportTest from "./components/ImportTest";
 
 const examples = [
   {
@@ -52,6 +55,18 @@ const examples = [
     title: "Default Values Test",
     description: "Test automatic default values from Zod schema",
     component: DefaultValuesExample,
+  },
+  {
+    id: "simple-zod",
+    title: "Simple Zod Example",
+    description: "Basic usage of react-rooks/zod import",
+    component: SimpleZodExample,
+  },
+  {
+    id: "zod-with-init",
+    title: "Zod with Init Function",
+    description: "Using createZodRook with async initialization",
+    component: ZodWithInitExample,
   },
 ];
 

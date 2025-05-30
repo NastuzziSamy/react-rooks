@@ -6,7 +6,6 @@ import type {
   RookContext,
   RookContextValue,
   UseStoreHookReturn,
-  RookInit,
   RookStoreReducer,
   RookReducers,
   RookComponent,
@@ -21,6 +20,7 @@ export const createUseRook =
       React.useContext<RookContextValue<Store>>(context);
 
     if (key === undefined) {
+      // Quand key est undefined, on retourne le store entier et la fonction update
       return [store, update] as UseStoreHookReturn<Store, StoreKey>;
     }
 
@@ -53,47 +53,30 @@ export const createUseRook =
     return [store[key], setValue] as UseStoreHookReturn<Store, StoreKey>;
   };
 
-// Helper function for better type inference when using init
-export function createRookWithInit<
-  DefaultStore extends RookStore,
-  Store extends RookStore
->(config: {
-  defaultStore: DefaultStore;
-  init: (store: DefaultStore) => Promise<Store>;
-  storeReducer?: RookStoreReducer<Store>;
-  reducers?: RookReducers<Store>;
-}): [
-  RookComponent,
-  <StoreKey extends keyof Store | undefined = undefined>(
-    key?: StoreKey
-  ) => UseStoreHookReturn<Store, StoreKey>
-] {
-  return createRook<Store, DefaultStore>(config);
-}
-
+// Overload pour l'inférence automatique avec init
 export const createRook = <
   Store extends RookStore,
-  DefaultStore extends RookStore = Store
+  DefaultStore extends Partial<Store>
 >({
   defaultStore,
   init,
   storeReducer,
   reducers,
-}:
-  | {
-      init: RookInit<Store, DefaultStore>;
-      defaultStore?: DefaultStore;
-      storeReducer?: RookStoreReducer<Store>;
-      reducers?: RookReducers<Store>;
-    }
+}: {
+  storeReducer?: RookStoreReducer<Store>;
+  reducers?: RookReducers<Store>;
+} & (
   | {
       init?: undefined;
       defaultStore: Store;
-      storeReducer?: RookStoreReducer<Store>;
-      reducers?: RookReducers<Store>;
-    }): [
+    }
+  | {
+      init: (initStore: DefaultStore) => Promise<Store>;
+      defaultStore?: DefaultStore;
+    }
+)): [
   RookComponent,
-  <StoreKey extends keyof Store | undefined = undefined>(
+  <StoreKey extends Extract<keyof Store, string> | undefined = undefined>(
     key?: StoreKey
   ) => UseStoreHookReturn<Store, StoreKey>
 ] => {
@@ -102,28 +85,19 @@ export const createRook = <
   const CreatedRook = ({
     // onInit,
     children,
-  }: React.PropsWithChildren) =>
-    init ? (
-      <Rook<Store, DefaultStore>
-        Provider={context.Provider}
-        storeReducer={storeReducer}
-        reducers={reducers}
-        init={init}
-        defaultStore={defaultStore as DefaultStore}
-      >
-        {children}
-      </Rook>
-    ) : (
-      <Rook<Store, Store>
-        Provider={context.Provider}
-        storeReducer={storeReducer}
-        reducers={reducers}
-        defaultStore={defaultStore as Store}
-      >
-        {children}
-      </Rook>
-    );
-
+  }: React.PropsWithChildren) => (
+    <Rook<Store, DefaultStore>
+      Provider={context.Provider}
+      storeReducer={storeReducer}
+      reducers={reducers}
+      init={
+        init || (async (initStore) => ({ ...initStore } as unknown as Store))
+      }
+      defaultStore={(defaultStore || {}) as DefaultStore}
+    >
+      {children}
+    </Rook>
+  );
   const useRook = createUseRook<Store>(context);
 
   return [CreatedRook, useRook];
@@ -140,11 +114,11 @@ export const createStoreRook = <Store extends RookStore>(
   } = {}
 ): [
   RookComponent,
-  <StoreKey extends keyof Store | undefined = undefined>(
+  <StoreKey extends Extract<keyof Store, string> | undefined = undefined>(
     key?: StoreKey
   ) => UseStoreHookReturn<Store, StoreKey>
 ] => {
-  return createRook<Store, Store>({
+  return createRook({
     defaultStore,
     reducers,
     storeReducer,
