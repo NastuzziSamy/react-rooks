@@ -6,6 +6,9 @@ import ClassicExample from "./examples/ClassicExample";
 import ContainedExample from "./examples/ContainedExample";
 import ReducedExample from "./examples/ReducedExample";
 import ZodExample from "./examples/ZodExample";
+import ZodRookExample from "./examples/ZodRookExample";
+import DefaultValuesExample from "./examples/DefaultValuesExample";
+import RookContainerExample from "./examples/RookContainerExample";
 
 const examples = [
   {
@@ -21,6 +24,12 @@ const examples = [
     component: ContainedExample,
   },
   {
+    id: "rook-container",
+    title: "RookContainer Example",
+    description: "Multiple stores with RookContainer and order importance",
+    component: RookContainerExample,
+  },
+  {
     id: "reduced",
     title: "Example with Reducers",
     description: "Usage of createRook with reducers and business logic",
@@ -31,6 +40,18 @@ const examples = [
     title: "Example with Zod",
     description: "Schema validation with createSchemedRook",
     component: ZodExample,
+  },
+  {
+    id: "zod-rook",
+    title: "createZodRook Example",
+    description: "Automatic Zod validation with createZodRook hook",
+    component: ZodRookExample,
+  },
+  {
+    id: "default-values",
+    title: "Default Values Test",
+    description: "Test automatic default values from Zod schema",
+    component: DefaultValuesExample,
   },
 ];
 

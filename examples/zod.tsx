@@ -1,9 +1,9 @@
 import * as React from "react";
-import { createSchemedRook } from "react-rooks";
+import { createZodRook } from "react-rooks/zod";
 import { z } from "zod";
 
 // Some global/stored values.
-export const [Rook, useRook] = createSchemedRook(
+export const [Rook, useRook] = createZodRook(
   z.object({
     user: z
       .object({
