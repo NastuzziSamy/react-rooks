@@ -1,16 +1,22 @@
-type ValueOf<T> = T extends Record<string, infer U> ? U : never;
+export type ValueOf<T> = T extends Record<string, infer U> ? U : never;
+
+export type StoreRead<T> = {
+  readonly [P in keyof T]: T[P] extends object ? StoreRead<T[P]> : T[P];
+};
 
 export type RookStore = Record<string, any>;
 export type RookStoreData<Store extends RookStore, Key> = Key extends Extract<
   keyof Store,
   string
 >
-  ? Store[Key]
-  : Store;
+  ? StoreRead<Store[Key]>
+  : StoreRead<Store>;
 
 export type RookContextValue<Store extends RookStore> = {
-  store: Store;
-  update: (values: Partial<Store> | ((prev: Store) => Partial<Store>)) => void;
+  store: StoreRead<Store>;
+  update: (
+    values: Partial<Store> | ((prev: StoreRead<Store>) => Partial<Store>)
+  ) => void;
 };
 export type RookContext<Store extends RookStore> = React.Context<
   RookContextValue<Store>
@@ -30,28 +36,28 @@ export type RookState<Store extends RookStore> =
     }
   | {
       inited: true;
-      store: Store;
+      store: StoreRead<Store>;
     };
 
 export type RookInit<
   Store extends RookStore,
   DefaultStore extends RookStore
-> = (initStore: DefaultStore) => Promise<Store>;
+> = (initStore: StoreRead<DefaultStore>) => Promise<Store>;
 
 export type RookStoreReducer<Store extends RookStore> = (
   values: Partial<Store>,
-  store: Store
+  store: StoreRead<Store>
 ) => Partial<Store>;
 
 export type RookReducer<
   Store extends RookStore,
   Key extends Extract<keyof Store, string>
-> = (newValue: Store[Key], oldValue: Store[Key]) => Store[Key];
+> = (newValue: Store[Key], oldValue: StoreRead<Store[Key]>) => Store[Key];
 
 export type RookReducers<Store extends RookStore> = Partial<{
   [Key in Extract<keyof Store, string>]: (
     newValue: Store[Key],
-    oldValue: Store[Key]
+    oldValue: StoreRead<Store[Key]>
   ) => Store[Key];
 }>;
 
@@ -72,17 +78,19 @@ export type UseStoreHookReturn<
   StoreKey extends keyof Store | undefined
 > = StoreKey extends undefined
   ? [
-      Store,
-      (values: Partial<Store> | ((prev: Store) => Partial<Store>)) => void
+      StoreRead<Store>,
+      (
+        values: Partial<Store> | ((prev: StoreRead<Store>) => Partial<Store>)
+      ) => void
     ]
   : StoreKey extends keyof Store
   ? [
-      Store[StoreKey],
+      StoreRead<Store>[StoreKey],
       (
         value:
-          | Store[StoreKey]
+          | StoreRead<Store[StoreKey]>
           | ((
-              prev: Store[Extract<StoreKey, keyof Store>]
+              prev: StoreRead<Store[Extract<StoreKey, keyof Store>]>
             ) => Store[Extract<StoreKey, keyof Store>])
       ) => void
     ]

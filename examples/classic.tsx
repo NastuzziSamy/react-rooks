@@ -7,11 +7,32 @@ enum Locale {
 }
 
 // Some global/stored values.
-export const [Rook, useRook] = createStoreRook({
-  user: null as { id: number; name: string } | null,
-  locale: Locale.EN,
-  title: "My React app",
-});
+export const [Rook, useRook] = createStoreRook(
+  {
+    user: null as { id: number; name: string } | null,
+    locale: Locale.EN,
+    title: "My React app",
+  },
+  {
+    reducers: {
+      user: (newValue, oldValue) => {
+        // If the user is the same, we do nothing.
+        return newValue === oldValue ? oldValue : newValue;
+      },
+      title: (newValue, oldValue) => {
+        // If the title is the same, we do nothing.
+        return newValue === oldValue ? oldValue : newValue;
+      },
+      locale: (newValue, oldValue) => {
+        // If the locale is the same, we do nothing.
+        return newValue === oldValue ? oldValue : newValue;
+      },
+    },
+    storeReducer: (values, store) => {
+      return store;
+    },
+  }
+);
 
 export const ChangeLocale = () => {
   const [title, setTitle] = useRook("title");

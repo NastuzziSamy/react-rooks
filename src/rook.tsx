@@ -1,5 +1,5 @@
 import * as React from "react";
-import { RookStore, RookState, RookProps } from "./type";
+import { RookStore, RookState, RookProps, StoreRead } from "./type";
 
 export const Rook = <
   Store extends RookStore,
@@ -17,7 +17,10 @@ export const Rook = <
     store: null,
   });
 
-  const reduceValues = (values: Partial<Store>, currentStore: Store) => {
+  const reduceValues = (
+    values: Partial<Store>,
+    currentStore: StoreRead<Store>
+  ) => {
     if (storeReducer) {
       values = storeReducer(values, currentStore);
     }
@@ -43,7 +46,7 @@ export const Rook = <
   };
 
   const updateStore = React.useCallback(
-    (values: Partial<Store> | ((prev: Store) => Partial<Store>)) => {
+    (values: Partial<Store> | ((prev: StoreRead<Store>) => Partial<Store>)) => {
       setRookState((currentState) => {
         if (!currentState.inited) {
           return currentState;
@@ -71,7 +74,7 @@ export const Rook = <
     (async () => {
       setRookState({
         inited: true,
-        store: await init(defaultStore as DefaultStore),
+        store: await init(defaultStore),
       });
     })();
   }, []);
@@ -83,7 +86,7 @@ export const Rook = <
   return (
     <Provider
       value={{
-        store: rookState.store as Store,
+        store: rookState.store,
         update: updateStore,
       }}
     >

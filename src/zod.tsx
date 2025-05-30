@@ -162,6 +162,7 @@ export const createZodRook = (config: ZodRookConfig<any>): [any, any] => {
       Provider={context.Provider}
       storeReducer={storeReducer}
       reducers={reducers}
+      init={async () => ({ ...validatedDefaultStore })}
       defaultStore={validatedDefaultStore}
     >
       {children}
