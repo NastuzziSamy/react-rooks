@@ -1,5 +1,5 @@
 import React from "react";
-import { createZodRook } from "react-rooks/zod";
+import { createZodRook } from "../../../index-zod";
 import { z } from "zod";
 
 // Schéma Zod pour un utilisateur avec quelques champs sans valeurs par défaut

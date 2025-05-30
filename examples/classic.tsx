@@ -24,10 +24,13 @@ export const ChangeLocale = () => {
 
   setUser({ id: 1, name: "John Doe" });
   setUser(null);
-  setUser((prev) => ({
-    id: prev?.id ? prev.id + 1 : 1,
-    name: "Jane Doe",
-  }));
+  setUser((prev) => {
+    // Vérification stricte du type prev
+    if (prev) {
+      return { id: prev.id + 1, name: "Jane Doe" };
+    }
+    return { id: 1, name: "Jane Doe" };
+  });
 
   // Test de type: user peut être null
   if (user) {

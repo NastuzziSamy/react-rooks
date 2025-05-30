@@ -1,16 +1,12 @@
 import React, { useEffect } from "react";
 import { createRook } from "react-rooks";
-
-const Locale = {
-  EN: "en",
-  FR: "fr",
-} as const;
+type LightColor = "green" | "orange" | "red";
 
 // Global store with createRook
 const [Rook, useRook] = createRook({
   defaultStore: {
     user: null as { id: number; name: string } | null,
-    locale: Locale.EN,
+    lightColor: "green" as LightColor,
     title: "My React App",
     counter: 0,
   },
@@ -58,40 +54,67 @@ const UserManager = () => {
   );
 };
 
-const LocaleManager = () => {
-  const [locale, setLocale] = useRook("locale");
+const TrafficLight = () => {
+  const [light, setLight] = useRook("lightColor");
+  const [timestamp, setTimestamp] = useRook("title");
 
   useEffect(() => {
-    // Simulate automatic change after 5 seconds
     const timer = setTimeout(() => {
-      setLocale(locale === Locale.EN ? Locale.FR : Locale.EN);
-    }, 5000);
+      const now = new Date().toLocaleTimeString();
+      setTimestamp(now);
+
+      setLight((prev) => {
+        if (prev === "green") {
+          return "orange";
+        } else if (prev === "orange") {
+          return "red";
+        } else {
+          return "green";
+        }
+      });
+    }, 2000);
 
     return () => clearTimeout(timer);
-  }, [locale, setLocale]);
+  }, [light, setLight, setTimestamp]);
+
+  const forceLight = (newLight: LightColor) => {
+    setLight(newLight);
+    setTimestamp(new Date().toLocaleTimeString());
+  };
 
   return (
     <div className="demo-section">
-      <h3>🌍 Language</h3>
+      <h3>🚦 Feu Tricolore</h3>
       <div className="demo-controls">
-        <div className="locale-buttons">
-          <button
-            className={`locale-button ${locale === Locale.EN ? "active" : ""}`}
-            onClick={() => setLocale(Locale.EN)}
+        <div className="traffic-light" style={{ display: "flex", gap: "10px" }}>
+          <div
+            className="light-display"
+            style={{ fontSize: "3rem", cursor: "pointer" }}
+            onClick={() => forceLight("green")}
           >
-            EN
-          </button>
-          <button
-            className={`locale-button ${locale === Locale.FR ? "active" : ""}`}
-            onClick={() => setLocale(Locale.FR)}
+            <span style={{ opacity: light === "green" ? 1 : 0.3 }}>🟢</span>
+          </div>
+          <div
+            className="light-display"
+            style={{ fontSize: "3rem", cursor: "pointer" }}
+            onClick={() => forceLight("orange")}
           >
-            FR
-          </button>
+            <span style={{ opacity: light === "orange" ? 1 : 0.3 }}>🟠</span>
+          </div>
+          <div
+            className="light-display"
+            style={{ fontSize: "3rem", cursor: "pointer" }}
+            onClick={() => forceLight("red")}
+          >
+            <span style={{ opacity: light === "red" ? 1 : 0.3 }}>🔴</span>
+          </div>
         </div>
       </div>
-      <div className="demo-state">Current language: {locale.toUpperCase()}</div>
+      <div className="demo-state">État actuel: {light}</div>
+      <div className="demo-state">Dernier changement: {timestamp}</div>
       <div className="demo-info">
-        💡 Language changes automatically every 5 seconds
+        💡 Le feu change automatiquement toutes les 2 secondes. Cliquez sur un
+        feu pour forcer l'état.
       </div>
     </div>
   );
@@ -145,7 +168,7 @@ const ClassicExample = () => {
         </div>
 
         <UserManager />
-        <LocaleManager />
+        <TrafficLight />
         <Counter />
         <StoreDisplay />
       </div>

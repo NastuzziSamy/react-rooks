@@ -24,7 +24,8 @@ const i18n = {
   changeLocale: (locale: Locale) => {
     I18N_CONFIGS.locale = locale;
   },
-  t: (key: string) => TRANSLATIONS[I18N_CONFIGS.locale][key],
+  t: (key: keyof (typeof TRANSLATIONS)[Locale.EN]) =>
+    TRANSLATIONS[I18N_CONFIGS.locale][key],
 };
 
 export const [Rook, useRook] = createRook({

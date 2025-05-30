@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { createZodRook } from "react-rooks/zod";
+import { createZodRook } from "../../../index-zod";
 import { z } from "zod";
 
 // Schéma Zod pour notre store
