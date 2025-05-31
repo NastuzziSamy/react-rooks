@@ -31,7 +31,7 @@ const i18n = {
 export const [Rook, useRook] = createRook({
   defaultStore: {
     user: null as { id: number; name: string } | null,
-    lazy_title: "page_title" as keyof (typeof TRANSLATIONS)[Locale.EN],
+    lazyTitle: "page_title" as keyof (typeof TRANSLATIONS)[Locale.EN],
   },
   init: async (store) => {
     // Set the initial locale. Here we defined the locale in the store.
@@ -45,8 +45,8 @@ export const [Rook, useRook] = createRook({
     };
   },
   reducers: {
-    lazy_title: (newValue, oldValue) => {
-      // If the lazy_title is the same, we do nothing.
+    lazyTitle: (newValue, oldValue) => {
+      // If the lazyTitle is the same, we do nothing.
       return newValue;
     },
     locale: (newValue, oldValue) => {
@@ -59,9 +59,9 @@ export const [Rook, useRook] = createRook({
     },
   },
   storeReducer: (values, store) => {
-    // If the lazy_title is changed, we update the title.
-    if (values.lazy_title && values.lazy_title !== store.lazy_title) {
-      document.title = i18n.t(values.lazy_title);
+    // If the lazyTitle is changed, we update the title.
+    if (values.lazyTitle && values.lazyTitle !== store.lazyTitle) {
+      document.title = i18n.t(values.lazyTitle);
     }
 
     return values;
@@ -100,7 +100,7 @@ export const ShowStore = () => {
       <h2>Store:</h2>
       <pre>{JSON.stringify(store, null, 2)}</pre>
       <h2>Lazy title:</h2>
-      <p>{i18n.t(store.lazy_title)}</p>
+      <p>{i18n.t(store.lazyTitle)}</p>
     </div>
   );
 };

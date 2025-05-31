@@ -1,15 +1,14 @@
-import React, { useEffect } from "react";
-import { createRook } from "react-rooks";
+import { useEffect } from "react";
+import { createStoreRook } from "react-rooks";
+import CodeTooltip from "../components/CodeTooltip";
 type LightColor = "green" | "orange" | "red";
 
-// Global store with createRook
-const [Rook, useRook] = createRook({
-  defaultStore: {
-    user: null as { id: number; name: string } | null,
-    lightColor: "green" as LightColor,
-    title: "My React App",
-    counter: 0,
-  },
+// Global store with createStoreRook
+const [Rook, useRook] = createStoreRook({
+  user: null as { id: number; name: string } | null,
+  lightColor: "green" as LightColor,
+  timestamp: null as string | null,
+  counter: 0,
 });
 
 const UserManager = () => {
@@ -24,23 +23,39 @@ const UserManager = () => {
   };
 
   const updateUser = () => {
-    setUser((prev: { id: number; name: string } | null) =>
-      prev ? { ...prev, name: "Jane Doe" } : null
-    );
+    setUser((prev) => (prev ? { ...prev, name: "Jane Doe" } : null));
   };
+
+  const codeTooltip = `const [user, setUser] = useRook("user");
+
+// Login user
+setUser({ id: Date.now(), name: "John Doe" });
+
+// Logout user  
+setUser(null);
+
+// Update user with function
+setUser((prev) => prev ? { ...prev, name: "Jane Doe" } : null);`;
 
   return (
     <div className="demo-section">
       <h3>👤 User Management</h3>
+      <CodeTooltip code={codeTooltip} />
       <div className="demo-controls">
-        <button className="demo-button" onClick={loginUser}>
+        <button
+          className={"demo-button" + (user ? " secondary" : "")}
+          onClick={loginUser}
+        >
           Login
         </button>
-        <button className="demo-button secondary" onClick={logoutUser}>
+        <button
+          className={"demo-button" + (user ? "" : " secondary")}
+          onClick={logoutUser}
+        >
           Logout
         </button>
         <button
-          className="demo-button secondary"
+          className={"demo-button" + (user ? "" : " secondary")}
           onClick={updateUser}
           disabled={!user}
         >
@@ -56,7 +71,7 @@ const UserManager = () => {
 
 const TrafficLight = () => {
   const [light, setLight] = useRook("lightColor");
-  const [timestamp, setTimestamp] = useRook("title");
+  const [timestamp, setTimestamp] = useRook("timestamp");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -82,9 +97,30 @@ const TrafficLight = () => {
     setTimestamp(new Date().toLocaleTimeString());
   };
 
+  const codeTooltip = `const [light, setLight] = useRook("lightColor");
+const [timestamp, setTimestamp] = useRook("timestamp");
+
+// Auto-update with useEffect
+useEffect(() => {
+  const timer = setTimeout(() => {
+    setTimestamp(new Date().toLocaleTimeString());
+    setLight((prev) => {
+      if (prev === "green") return "orange";
+      if (prev === "orange") return "red";
+      return "green";
+    });
+  }, 2000);
+  return () => clearTimeout(timer);
+}, [light]);
+
+// Force update
+setLight("green");
+setTimestamp(new Date().toLocaleTimeString());`;
+
   return (
     <div className="demo-section">
-      <h3>🚦 Feu Tricolore</h3>
+      <h3>🚦 Traffic Light</h3>
+      <CodeTooltip code={codeTooltip} />
       <div className="demo-controls">
         <div className="traffic-light" style={{ display: "flex", gap: "10px" }}>
           <div
@@ -110,35 +146,82 @@ const TrafficLight = () => {
           </div>
         </div>
       </div>
-      <div className="demo-state">État actuel: {light}</div>
-      <div className="demo-state">Dernier changement: {timestamp}</div>
+      <div className="demo-state">Current state: {light}</div>
+      <div className="demo-state">Last change: {timestamp}</div>
       <div className="demo-info">
-        💡 Le feu change automatiquement toutes les 2 secondes. Cliquez sur un
-        feu pour forcer l'état.
+        💡 The light changes automatically every 2 seconds. Click on a light to
+        force the state.
       </div>
     </div>
   );
 };
 
-const Counter = () => {
+const useCounterReducer = () => {
   const [counter, setCounter] = useRook("counter");
 
-  const increment = () => setCounter(counter + 1);
-  const decrement = () => setCounter(counter - 1);
-  const reset = () => setCounter(0);
+  const reducer = (action: "increment" | "decrement" | "reset") => {
+    switch (action) {
+      case "increment":
+        setCounter((prev) => prev + 1);
+        break;
+      case "decrement":
+        setCounter((prev) => prev - 1);
+        break;
+      case "reset":
+        setCounter(0);
+        break;
+      default:
+        break;
+    }
+  };
+
+  return [counter, reducer] as const;
+};
+
+const Counter = () => {
+  const [counter, reducer] = useCounterReducer();
+
+  const increment = () => reducer("increment");
+  const decrement = () => reducer("decrement");
+  const reset = () => reducer("reset");
+
+  const codeTooltip = `const useCounterReducer = () => {
+  const [counter, setCounter] = useRook("counter");
+  
+  const reducer = (action: "increment" | "decrement" | "reset") => {
+    switch (action) {
+      case "increment":
+        setCounter((prev) => prev + 1);
+        break;
+      case "decrement":
+        setCounter((prev) => prev - 1);
+        break;
+      case "reset":
+        setCounter(0);
+        break;
+    }
+  };
+  
+  return [counter, reducer] as const;
+};
+
+// Usage
+const [counter, reducer] = useCounterReducer();
+reducer("increment");`;
 
   return (
     <div className="demo-section">
-      <h3>🔢 Global Counter</h3>
+      <h3>🔢 Global Counter actions</h3>
+      <CodeTooltip code={codeTooltip} />
       <div className="demo-controls">
         <button className="demo-button" onClick={increment}>
-          + 1
+          INCREMENT
         </button>
         <button className="demo-button" onClick={decrement}>
-          - 1
+          DECREMENT
         </button>
         <button className="demo-button secondary" onClick={reset}>
-          Reset
+          RESET
         </button>
       </div>
       <div className="demo-state">Counter: {counter}</div>
@@ -149,9 +232,29 @@ const Counter = () => {
 const StoreDisplay = () => {
   const [store] = useRook();
 
+  const storeDisplayCodeTooltip = `// Accessing the entire store state
+const StoreDisplay = () => {
+  const [store] = useRook(); // Get the whole store
+  
+  return (
+    <div>
+      {JSON.stringify(store, null, 2)}
+    </div>
+  );
+};
+
+// The store contains all state:
+// {
+//   "user": { "id": 1, "name": "Alice", "role": "admin" },
+//   "lightColor": "green",
+//   "timestamp": "2024-01-15T10:30:00.000Z",
+//   "counter": 5
+// }`;
+
   return (
     <div className="demo-section">
       <h3>📊 Complete Store State</h3>
+      <CodeTooltip code={storeDisplayCodeTooltip} />
       <div className="demo-state">{JSON.stringify(store, null, 2)}</div>
     </div>
   );

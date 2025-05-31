@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { createRook } from "react-rooks";
 import { z } from "zod";
+import CodeTooltip from "../components/CodeTooltip";
 
 // Validation schemas with Zod
 const UserSchema = z.object({
@@ -83,6 +84,42 @@ const UserForm = () => {
   return (
     <div className="demo-section">
       <h3>👤 User Form (Zod Validation)</h3>
+      <CodeTooltip
+        code={`// Zod Schema Validation with createRook
+const UserSchema = z.object({
+  id: z.string().min(1, "ID is required"),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email"),
+  age: z.number().min(0, "Age must be positive").max(120, "Age must be realistic"),
+});
+
+type User = z.infer<typeof UserSchema>;
+
+// Manual validation in component
+const UserForm = () => {
+  const [user, setUser] = useRook("user");
+  const [formData, setFormData] = useState({ id: "", name: "", email: "", age: "" });
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    try {
+      // Manual Zod validation
+      const validatedUser = UserSchema.parse({
+        ...formData,
+        age: parseInt(formData.age) || 0,
+      });
+      setUser(validatedUser); // ✅ Valid data stored
+      setValidationErrors([]);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        setValidationErrors(error.errors.map(err => err.message));
+      }
+    }
+  };
+  
+  return <form onSubmit={handleSubmit}>...</form>;
+};`}
+      />
 
       <form onSubmit={handleSubmit} style={{ marginBottom: "1rem" }}>
         <div

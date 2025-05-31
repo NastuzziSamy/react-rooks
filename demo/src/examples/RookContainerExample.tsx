@@ -1,35 +1,32 @@
-import React from "react";
-import { createRook, RookContainer } from "react-rooks";
+import { createStoreRook, RookContainer } from "react-rooks";
+import CodeTooltip from "../components/CodeTooltip";
 
 // 🏪 Store 1: User Management (highest level)
-const [UserStore, useUser] = createRook({
-  defaultStore: {
-    user: { id: 1, name: "Alice", role: "admin" },
-    isLoggedIn: true,
+const [UserStore, useUser] = createStoreRook({
+  user: { id: 1, name: "Alice", role: "admin" } as {
+    id: number;
+    name: string;
+    role: string;
   },
+  isLoggedIn: true,
 });
 
 // 🎨 Store 2: Theme Management (middle level)
-const [ThemeStore, useTheme] = createRook({
-  defaultStore: {
-    mode: "light" as "light" | "dark",
-    primaryColor: "#3b82f6",
-    fontSize: 16,
-  },
+const [ThemeStore, useTheme] = createStoreRook({
+  mode: "light" as "light" | "dark",
+  primaryColor: "#3b82f6",
 });
 
 // 🛒 Store 3: Shopping Cart (lowest level, depends on user)
-const [CartStore, useCart] = createRook({
-  defaultStore: {
-    items: [] as {
-      id: number;
-      name: string;
-      price: number;
-      quantity: number;
-    }[],
-    total: 0,
-    currency: "USD",
-  },
+const [CartStore, useCart] = createStoreRook({
+  items: [] as {
+    id: number;
+    name: string;
+    price: number;
+    quantity: number;
+  }[],
+  total: 0,
+  currency: "USD",
 });
 
 // Component that uses User store (highest level)
@@ -37,17 +34,28 @@ const UserInfo = () => {
   const [user, setUser] = useUser("user");
   const [isLoggedIn, setIsLoggedIn] = useUser("isLoggedIn");
 
+  const userCodeTooltip = `// User Store Definition
+const [UserStore, useUser] = createStoreRook({
+  user: { id: 1, name: "Alice", role: "admin" },
+  isLoggedIn: true,
+});
+
+// Usage in Component
+const UserInfo = () => {
+  const [user, setUser] = useUser("user");
+  const [isLoggedIn, setIsLoggedIn] = useUser("isLoggedIn");
+  
+  return (
+    <button onClick={() => setUser({...user, name: "Bob"})}>
+      Switch User
+    </button>
+  );
+};`;
+
   return (
     <div className="demo-section">
-      <h4>👤 User Information</h4>
-      <div className="demo-state">
-        <p>
-          <strong>Name:</strong> {user.name} ({user.role})
-        </p>
-        <p>
-          <strong>Status:</strong> {isLoggedIn ? "Logged In" : "Logged Out"}
-        </p>
-      </div>
+      <h3>👤 User Management</h3>
+      <CodeTooltip code={userCodeTooltip} />
       <div className="demo-controls">
         <button
           className="demo-button"
@@ -64,6 +72,10 @@ const UserInfo = () => {
           Toggle Login
         </button>
       </div>
+      <div className="demo-state">
+        User: {user.name} ({user.role}) -{" "}
+        {isLoggedIn ? "Logged In" : "Logged Out"}
+      </div>
     </div>
   );
 };
@@ -72,22 +84,34 @@ const UserInfo = () => {
 const ThemeControls = () => {
   const [mode, setMode] = useTheme("mode");
   const [primaryColor, setPrimaryColor] = useTheme("primaryColor");
-  const [fontSize, setFontSize] = useTheme("fontSize");
+
+  const themeCodeTooltip = `// Theme Store Definition
+const [ThemeStore, useTheme] = createStoreRook({
+  mode: "light" as "light" | "dark",
+  primaryColor: "#3b82f6",
+});
+
+// Usage in Component
+const ThemeControls = () => {
+  const [mode, setMode] = useTheme("mode");
+  const [primaryColor, setPrimaryColor] = useTheme("primaryColor");
+  
+  return (
+    <button onClick={() => setMode(mode === "light" ? "dark" : "light")}>
+      Toggle Theme
+    </button>
+  );
+};`;
+
+  const resetTheme = () => {
+    setMode("light");
+    setPrimaryColor("#3b82f6");
+  };
 
   return (
     <div className="demo-section">
-      <h4>🎨 Theme Settings</h4>
-      <div className="demo-state">
-        <p>
-          <strong>Mode:</strong> {mode}
-        </p>
-        <p>
-          <strong>Color:</strong> {primaryColor}
-        </p>
-        <p>
-          <strong>Font Size:</strong> {fontSize}px
-        </p>
-      </div>
+      <h3>🎨 Theme Settings</h3>
+      <CodeTooltip code={themeCodeTooltip} />
       <div className="demo-controls">
         <button
           className="demo-button"
@@ -103,12 +127,12 @@ const ThemeControls = () => {
         >
           Change Color
         </button>
-        <button
-          className="demo-button"
-          onClick={() => setFontSize(fontSize === 16 ? 18 : 16)}
-        >
-          Font Size
+        <button className="demo-button secondary" onClick={resetTheme}>
+          Reset
         </button>
+      </div>
+      <div className="demo-state">
+        Mode: {mode} | Color: {primaryColor}
       </div>
     </div>
   );
@@ -122,6 +146,23 @@ const CartManager = () => {
   const [primaryColor] = useTheme("primaryColor");
   const [items, setItems] = useCart("items");
   const [total, setTotal] = useCart("total");
+
+  const cartCodeTooltip = `// Cart Store Definition
+const [CartStore, useCart] = createStoreRook({
+  items: [],
+  total: 0,
+  currency: "USD",
+});
+
+// Multi-Store Consumer Component
+const CartManager = () => {
+  const [user] = useUser("user");        // From UserStore
+  const [mode] = useTheme("mode");       // From ThemeStore
+  const [items, setItems] = useCart("items"); // From CartStore
+  
+  // Can access all stores because it's nested inside RookContainer
+  return <div>Cart for {user.name} in {mode} mode</div>;
+};`;
 
   const addItem = () => {
     if (!isLoggedIn) {
@@ -153,36 +194,15 @@ const CartManager = () => {
     backgroundColor: mode === "dark" ? "#1f2937" : "#f9fafb",
     borderColor: primaryColor,
     color: mode === "dark" ? "#f9fafb" : "#1f2937",
+    border: `2px solid ${primaryColor}`,
+    borderRadius: "8px",
+    padding: "1rem",
   };
 
   return (
     <div className="demo-section" style={cartStyle}>
-      <h4>🛒 Shopping Cart (Multi-Store Consumer)</h4>
-
-      <div className="demo-state">
-        <p>
-          <strong>Customer:</strong> {user.name} ({isLoggedIn ? "✅" : "❌"})
-        </p>
-        <p>
-          <strong>Theme:</strong> {mode} mode
-        </p>
-        <p>
-          <strong>Items:</strong> {items.length}
-        </p>
-        <p>
-          <strong>Total:</strong> ${total.toFixed(2)}
-        </p>
-      </div>
-
-      {items.length > 0 && (
-        <div style={{ marginTop: "10px", fontSize: "14px" }}>
-          {items.map((item) => (
-            <div key={item.id} style={{ marginBottom: "5px" }}>
-              {item.name} - ${item.price} x {item.quantity}
-            </div>
-          ))}
-        </div>
-      )}
+      <h3>🛒 Shopping Cart (Multi-Store Consumer)</h3>
+      <CodeTooltip code={cartCodeTooltip} />
 
       <div className="demo-controls">
         <button
@@ -198,7 +218,23 @@ const CartManager = () => {
         </button>
       </div>
 
-      <div style={{ marginTop: "15px", fontSize: "12px", opacity: 0.7 }}>
+      <div className="demo-state">
+        Customer: {user.name} ({isLoggedIn ? "✅" : "❌"}) | Theme: {mode} |
+        Items: {items.length} | Total: ${total.toFixed(2)}
+      </div>
+
+      {items.length > 0 && (
+        <div style={{ marginTop: "10px", fontSize: "14px" }}>
+          <strong>Cart Items:</strong>
+          {items.map((item) => (
+            <div key={item.id} style={{ marginLeft: "10px" }}>
+              • {item.name} - ${item.price} x {item.quantity}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="demo-info" style={{ marginTop: "15px" }}>
         💡 This component consumes data from all three stores above it!
       </div>
     </div>
@@ -207,29 +243,31 @@ const CartManager = () => {
 
 // Main example component
 const RookContainerExample = () => {
+  const rookContainerCodeTooltip = `// Store Order and RookContainer Usage
+const [UserStore, useUser] = createStoreRook({...});
+const [ThemeStore, useTheme] = createStoreRook({...});
+const [CartStore, useCart] = createStoreRook({...});
+
+// Order matters! Each store can access stores above it
+<RookContainer rooks={[UserStore, ThemeStore, CartStore]}>
+  <UserInfo />     {/* Can only use UserStore */}
+  <ThemeControls /> {/* Can use UserStore + ThemeStore */}
+  <CartManager />   {/* Can use ALL stores */}
+</RookContainer>
+
+// If order was [CartStore, ThemeStore, UserStore]:
+// - UserStore could access CartStore + ThemeStore
+// - ThemeStore could only access CartStore
+// - CartStore would be independent`;
+
   return (
-    <div className="demo-container">
-      <h3>🏗️ RookContainer Example</h3>
-
-      <div className="demo-explanation">
-        <p>
-          <strong>RookContainer</strong> allows you to combine multiple stores.
-          The <strong>order matters</strong>: stores are nested from top to
-          bottom, so lower components can consume from all stores above them.
-        </p>
-
-        <div
-          style={{
-            marginTop: "10px",
-            fontSize: "14px",
-            fontFamily: "monospace",
-          }}
-        >
-          Order: [UserStore, ThemeStore, CartStore] →<br />
-          CartStore can access UserStore + ThemeStore ✅<br />
-          ThemeStore can access UserStore ✅<br />
-          UserStore is independent 🔒
-        </div>
+    <div className="example-demo">
+      <div className="demo-info">
+        <strong>RookContainer Example:</strong> Combine multiple stores with{" "}
+        <code>RookContainer</code>. Using <code>createStoreRook</code> for
+        cleaner syntax. The <strong>order matters</strong>: stores are nested
+        from top to bottom, so lower components can consume from all stores
+        above them.
       </div>
 
       {/* ⭐ The magic happens here! Order is crucial */}
@@ -239,15 +277,20 @@ const RookContainerExample = () => {
         <CartManager />
 
         <div className="demo-section">
-          <h4>🔄 Wrong Order Example</h4>
-          <p style={{ fontSize: "14px", color: "#ef4444" }}>
-            If we put CartStore first: [CartStore, UserStore, ThemeStore]
-            <br />→ CartStore couldn't access UserStore or ThemeStore! ❌
-          </p>
-          <p style={{ fontSize: "14px", color: "#10b981" }}>
-            Current order: [UserStore, ThemeStore, CartStore]
-            <br />→ CartStore can access both UserStore and ThemeStore! ✅
-          </p>
+          <h3>🔄 Store Order Explanation</h3>
+          <CodeTooltip code={rookContainerCodeTooltip} />
+          <div className="demo-state">
+            <div style={{ fontFamily: "monospace", fontSize: "14px" }}>
+              Order: [UserStore, ThemeStore, CartStore] →<br />
+              CartStore can access UserStore + ThemeStore ✅<br />
+              ThemeStore can access UserStore ✅<br />
+              UserStore is independent 🔒
+            </div>
+          </div>
+          <div className="demo-info">
+            💡 If we put CartStore first, it couldn't access UserStore or
+            ThemeStore! The order determines the nesting hierarchy.
+          </div>
         </div>
       </RookContainer>
     </div>

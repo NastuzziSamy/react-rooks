@@ -1,14 +1,16 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import path from "path";
+import { fileURLToPath, URL } from "node:url";
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "react-rooks": path.resolve(__dirname, "../index.tsx"),
-      "react-rooks/zod": path.resolve(__dirname, "../index-zod.tsx"),
+      "react-rooks": fileURLToPath(new URL("../index.tsx", import.meta.url)),
+      "react-rooks/zod": fileURLToPath(
+        new URL("../index-zod.tsx", import.meta.url)
+      ),
     },
   },
   optimizeDeps: {

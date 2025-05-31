@@ -242,7 +242,7 @@ const ItemsManager = () => {
 
     try {
       // La validation Zod sera automatiquement appliquée
-      setItems((prev) => [...prev, newItem.trim()]);
+      setItems((prev: string[]) => [...prev, newItem.trim()]);
       setNewItem("");
       setError("");
     } catch (err) {
@@ -253,13 +253,15 @@ const ItemsManager = () => {
   };
 
   const removeItem = (index: number) => {
-    setItems((prev) => prev.filter((_, i) => i !== index));
+    setItems((prev: string[]) =>
+      prev.filter((_: string, i: number) => i !== index)
+    );
   };
 
   const testInvalidItem = () => {
     // Test : essayer d'ajouter un item vide (devrait être rejeté par Zod)
     try {
-      setItems((prev) => [...prev, ""]);
+      setItems((prev: string[]) => [...prev, ""]);
     } catch (err) {
       console.log("Expected validation error:", err);
     }
@@ -316,7 +318,7 @@ const ItemsManager = () => {
         Items ({items?.length}/{settings?.maxItems}):
         {items?.length > 0 ? (
           <ul style={{ margin: "0.5rem 0 0 0", paddingLeft: "1rem" }}>
-            {items?.map((item, idx) => (
+            {items?.map((item: string, idx: number) => (
               <li
                 key={idx}
                 style={{

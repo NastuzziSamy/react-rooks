@@ -1,5 +1,5 @@
-import React from "react";
 import { createRook } from "react-rooks";
+import CodeTooltip from "../components/CodeTooltip";
 
 const Locale = {
   EN: "en",
@@ -53,21 +53,21 @@ const i18n = {
 
 // Store with simulated reducers
 const [Rook, useRook] = createRook<{
-  lazy_title: string;
-  greeting_key: string;
-  user_count: number;
-  last_action: string;
+  lazyTitle: string;
+  greetingKey: string;
+  userCount: number;
+  lastAction: string;
   locale: LocaleType;
 }>({
   defaultStore: {
-    lazy_title: "page_title",
-    greeting_key: "greeting",
-    user_count: 0,
-    last_action: "Initialization",
+    lazyTitle: "page_title",
+    greetingKey: "greeting",
+    userCount: 0,
+    lastAction: "Initialization",
     locale: Locale.FR,
   },
   reducers: {
-    locale: (newValue: LocaleType, oldValue: LocaleType) => {
+    locale: (newValue, oldValue) => {
       // Language reducer - performs side effects
       if (newValue !== oldValue) {
         i18n.changeLocale(newValue);
@@ -75,29 +75,34 @@ const [Rook, useRook] = createRook<{
       }
       return newValue;
     },
-    user_count: (newValue: number, oldValue: number) => {
+    userCount: (newValue, oldValue) => {
       // User count reducer
+      if (newValue <= 0) {
+        console.warn("👥 User count cannot be less than 0. Resetting to 0.");
+        return 0;
+      }
+
       console.log(`👥 User count: ${oldValue} → ${newValue}`);
       return newValue;
     },
   },
   storeReducer: (newValues, store) => {
     // Store reducer - handles side effects and updates
-    if (newValues.lazy_title && newValues.lazy_title !== store.lazy_title) {
-      document.title = i18n.t(newValues.lazy_title);
+    if (newValues.lazyTitle && newValues.lazyTitle !== store.lazyTitle) {
+      document.title = i18n.t(newValues.lazyTitle);
       console.log(
-        `📄 Title updated: ${store.lazy_title} → ${newValues.lazy_title}`
+        `📄 Title updated: ${store.lazyTitle} → ${newValues.lazyTitle}`
       );
-      newValues.last_action = `Title changed to ${newValues.lazy_title}`;
+      newValues.lastAction = `Title changed to ${newValues.lazyTitle}`;
     } else if (newValues.locale && newValues.locale !== store.locale) {
-      document.title = i18n.t(store.lazy_title);
-      console.log(`🌍 Locale changed: ${store.locale} → ${newValues.locale}`);
-      newValues.last_action = `Locale changed to ${newValues.locale}`;
-    } else if (newValues.user_count !== undefined) {
-      console.log(
-        `👥 User count updated: ${store.user_count} → ${newValues.user_count}`
-      );
-      newValues.last_action = `User count changed to ${newValues.user_count}`;
+      document.title = i18n.t(store.lazyTitle);
+      newValues.lastAction = `Locale changed to ${newValues.locale}`;
+    } else if (newValues.userCount !== undefined) {
+      if (newValues.userCount === 0 && store.userCount === 0) {
+        newValues.lastAction = `User count remains at 0`;
+      } else {
+        newValues.lastAction = `User count changed to ${newValues.userCount}`;
+      }
     }
 
     return newValues;
@@ -107,9 +112,40 @@ const [Rook, useRook] = createRook<{
 const LanguageControls = () => {
   const [locale, setLocale] = useRook("locale");
 
+  const languageCodeTooltip = `// Language Reducer with Side Effects
+const [Rook, useRook] = createRook({
+  defaultStore: {
+    locale: "fr",
+    // ...other state
+  },
+  reducers: {
+    locale: (newValue, oldValue) => {
+      // Reducer performs side effects when locale changes
+      if (newValue !== oldValue) {
+        i18n.changeLocale(newValue);
+        console.log(\`🌍 Language changed: \${oldValue} → \${newValue}\`);
+      }
+      return newValue;
+    },
+  },
+});
+
+// Component using locale reducer
+const LanguageControls = () => {
+  const [locale, setLocale] = useRook("locale");
+  
+  // When locale changes, reducer automatically handles i18n setup
+  return (
+    <button onClick={() => setLocale("en")}>
+      Switch to English
+    </button>
+  );
+};`;
+
   return (
     <div className="demo-section">
       <h3>🌍 Language Controls (with Reducer)</h3>
+      <CodeTooltip code={languageCodeTooltip} />
       <div className="demo-controls">
         <div className="locale-buttons">
           <button
@@ -127,16 +163,39 @@ const LanguageControls = () => {
         </div>
       </div>
       <div className="demo-state">Current language: {locale.toUpperCase()}</div>
+      <div className="demo-info">
+        💡 Language changes go through the reducer which automatically updates
+        the i18n configuration
+      </div>
     </div>
   );
 };
 
 const TranslationDisplay = () => {
-  const [greetingKey] = useRook("greeting_key");
+  const [greetingKey] = useRook("greetingKey");
+
+  const translationCodeTooltip = `// Dynamic Translation Component
+const TranslationDisplay = () => {
+  const [greetingKey] = useRook("greetingKey");
+  
+  // i18n.t() automatically uses current locale from store
+  // When locale changes via reducer, all translations update
+  return (
+    <div>
+      <strong>Greeting:</strong> {i18n.t(greetingKey)}
+      <strong>Welcome:</strong> {i18n.t("welcome")}
+    </div>
+  );
+};
+
+// Translation keys stored in store, actual text resolved dynamically
+// EN: "Hello, do you like React Rooks?"
+// FR: "Bonjour, aimez-vous React Rooks ?"`;
 
   return (
     <div className="demo-section">
       <h3>💬 Dynamic Translations</h3>
+      <CodeTooltip code={translationCodeTooltip} />
       <div className="demo-state">
         <div>
           <strong>Greeting:</strong> {i18n.t(greetingKey)}
@@ -152,14 +211,47 @@ const TranslationDisplay = () => {
   );
 };
 
+const titleTooltip = `// Store Reducer for Complex Side Effects
+  const [Rook, useRook] = createRook({
+    defaultStore: { lazyTitle: "page_title" },
+    storeReducer: (newValues, store) => {
+      // Store reducer runs on every state change
+      if (newValues.lazyTitle && newValues.lazyTitle !== store.lazyTitle) {
+        // Side effect: Update browser tab title
+        document.title = i18n.t(newValues.lazyTitle);
+        console.log(\`📄 Title updated: \${store.lazyTitle} → \${newValues.lazyTitle}\`);
+        
+        // Can modify other state values during update
+        newValues.lastAction = \`Title changed to \${newValues.lazyTitle}\`;
+      }
+      return newValues;
+    },
+  });
+
+  // Component that triggers store reducer
+  const TitleManager = () => {
+    const [lazyTitle, setLazyTitle] = useRook("lazyTitle");
+    
+    // When lazyTitle changes, storeReducer automatically:
+    // 1. Updates document.title with translated text
+    // 2. Logs the change
+    // 3. Updates lastAction field
+    return (
+      <button onClick={() => setLazyTitle("welcome")}>
+        Change Title
+      </button>
+    );
+  };`;
+
 const TitleManager = () => {
-  const [lazyTitle, setLazyTitle] = useRook("lazy_title");
+  const [lazyTitle, setLazyTitle] = useRook("lazyTitle");
 
   const titleOptions = ["page_title", "welcome", "goodbye"] as const;
 
   return (
     <div className="demo-section">
       <h3>📄 Title Management (with Store Reducer)</h3>
+      <CodeTooltip code={titleTooltip} />
       <div className="demo-controls">
         {titleOptions.map((title) => (
           <button
@@ -184,24 +276,58 @@ const TitleManager = () => {
 };
 
 const UserCounter = () => {
-  const [userCount, setUserCount] = useRook("user_count");
-
-  const addUser = () => setUserCount(userCount + 1);
-  const removeUser = () => setUserCount(Math.max(0, userCount - 1));
+  const [userCount, setUserCount] = useRook("userCount");
+  const addUser = () => setUserCount((prev) => prev + 1);
+  const removeUser = () => setUserCount((prev) => Math.max(prev - 1, 0));
   const resetUsers = () => setUserCount(0);
+
+  const userCounterTooltip = `// User Counter with Validation Reducer
+const [Rook, useRook] = createRook({
+  defaultStore: {
+    userCount: 0,
+    // ...other state
+  },
+  reducers: {
+    userCount: (newValue, oldValue) => {
+      // Reducer validates and handles negative values
+      if (newValue <= 0) {
+        console.warn("👥 User count cannot be less than 0. Resetting to 0.");
+        return 0;
+      }
+      
+      console.log(\`👥 User count: \${oldValue} → \${newValue}\`);
+      return newValue;
+    },
+  },
+});
+
+// Component using user counter with reducer validation
+const UserCounter = () => {
+  const [userCount, setUserCount] = useRook("userCount");
+  
+  const addUser = () => setUserCount((prev) => prev + 1);
+  const removeUser = () => setUserCount((prev) => prev - 1); // Reducer handles validation if count < 0
+  const resetUsers = () => setUserCount(0);
+  
+  return (
+    <div>
+      <button onClick={addUser}>+ User</button>
+      <button onClick={removeUser}>- User</button>
+      <button onClick={resetUsers}>Reset</button>
+      <div>User count: {userCount}</div>
+    </div>
+  );
+};`;
 
   return (
     <div className="demo-section">
       <h3>👥 User Counter (with Reducer)</h3>
+      <CodeTooltip code={userCounterTooltip} />
       <div className="demo-controls">
         <button className="demo-button" onClick={addUser}>
           + User
         </button>
-        <button
-          className="demo-button"
-          onClick={removeUser}
-          disabled={userCount === 0}
-        >
+        <button className="demo-button" onClick={removeUser}>
           - User
         </button>
         <button className="demo-button secondary" onClick={resetUsers}>
@@ -209,12 +335,15 @@ const UserCounter = () => {
         </button>
       </div>
       <div className="demo-state">User count: {userCount}</div>
+      <div className="demo-info">
+        💡 The reducer prevents negative values and logs all changes
+      </div>
     </div>
   );
 };
 
 const ActionLogger = () => {
-  const [lastAction] = useRook("last_action");
+  const [lastAction] = useRook("lastAction");
 
   return (
     <div className="demo-section">

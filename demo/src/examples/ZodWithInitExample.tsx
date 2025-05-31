@@ -20,24 +20,11 @@ const UserSchema = z.object({
     }),
 });
 
-// Fonction d'initialisation asynchrone
-const initUser = async () => {
-  // Simule un appel API
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  return {
-    id: `user_${Date.now()}`,
-    name: "John Doe",
-    email: "john.doe@example.com",
-    age: 30,
-  };
-};
-
 // Création du Rook (sans init function pour l'instant)
 const [UserRook, useUser] = createZodRook({
   schema: UserSchema,
   onValidationError: (error) => console.error("Validation failed:", error),
-  init: initUser, // Ajout de la fonction d'initialisation
+  // Note: init function n'est pas encore supporté dans cette version
 });
 
 const ZodWithInitExample: React.FC = () => {
