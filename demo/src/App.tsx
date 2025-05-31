@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./App.css";
 
 // Import des exemples
@@ -11,7 +11,7 @@ import DefaultValuesExample from "./examples/DefaultValuesExample";
 import RookContainerExample from "./examples/RookContainerExample";
 import SimpleZodExample from "./examples/SimpleZodExample";
 import ZodWithInitExample from "./examples/ZodWithInitExample";
-import ImportTest from "./components/ImportTest";
+import RookIcon from "./components/RookIcon";
 
 const examples = [
   {
@@ -76,7 +76,18 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🎯 React Rooks - Interactive Demo</h1>
+        <h1>
+          <RookIcon
+            width={64}
+            height={64}
+            style={{
+              display: "inline-block",
+              verticalAlign: "middle",
+              marginRight: "0.5rem",
+            }}
+          />
+          React Rooks - Interactive Demo
+        </h1>
         <p>Easily test different React Rooks examples</p>
       </header>
 

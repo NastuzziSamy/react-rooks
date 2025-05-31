@@ -65,3 +65,263 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* Animations and styles for code tooltips */
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.code-tooltip-container {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: row;
+}
+
+/* Keep trigger visible when hovering container */
+.code-tooltip-container:hover .code-tooltip-trigger {
+  transform: scale(1.15) rotate(5deg);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(147, 51, 234, 0.2));
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3), 0 0 20px rgba(147, 51, 234, 0.2);
+}
+
+.code-tooltip-trigger {
+  cursor: pointer;
+  font-size: 18px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+  min-width: 40px;
+  text-align: center;
+  position: relative;
+  z-index: 999;
+}
+
+.code-tooltip-trigger:hover {
+  transform: scale(1.15) rotate(5deg);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(147, 51, 234, 0.2));
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3), 0 0 20px rgba(147, 51, 234, 0.2);
+}
+
+.code-tooltip-trigger:active {
+  transform: scale(1.05);
+}
+
+.code-tooltip-content {
+  position: absolute;
+  top: -20px;
+  right: 75px;
+  margin-top: 16px;
+  min-width: 450px;
+  max-width: 650px;
+  background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+  color: #e5e5e5;
+  border-radius: 12px;
+  font-size: 13px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  line-height: 1.5;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4), 
+    0 8px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 10002;
+  white-space: pre-wrap;
+  overflow: hidden;
+  max-height: 450px;
+  animation: tooltipFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(20px);
+  pointer-events: auto;
+}
+
+.code-tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px 8px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 12px;
+}
+
+.code-tooltip-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #a1a1aa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.code-tooltip-copy-btn {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.code-tooltip-copy-btn:hover {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.5);
+  transform: scale(1.05);
+}
+
+.code-tooltip-content pre {
+  padding: 0 20px 20px 20px;
+  overflow: auto;
+  max-height: 350px;
+  margin: 0;
+}
+
+.code-tooltip-arrow {
+  position: absolute;
+  top: -9px;
+  right: 20px;
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: none;
+  border-right: none;
+  transform: rotate(45deg);
+  z-index: 9998;
+}
+
+@keyframes tooltipFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Ensure demo sections have relative positioning for absolute tooltip positioning */
+.demo-section {
+  position: relative;
+}
+
+/* Custom Prism.js styling for code tooltips */
+.code-tooltip-content .token.comment,
+.code-tooltip-content .token.prolog,
+.code-tooltip-content .token.doctype,
+.code-tooltip-content .token.cdata {
+  color: #6a737d;
+  font-style: italic;
+}
+
+.code-tooltip-content .token.punctuation {
+  color: #d1d5db;
+}
+
+.code-tooltip-content .token.namespace {
+  opacity: 0.7;
+}
+
+.code-tooltip-content .token.property,
+.code-tooltip-content .token.tag,
+.code-tooltip-content .token.boolean,
+.code-tooltip-content .token.number,
+.code-tooltip-content .token.constant,
+.code-tooltip-content .token.symbol,
+.code-tooltip-content .token.deleted {
+  color: #f97316;
+}
+
+.code-tooltip-content .token.selector,
+.code-tooltip-content .token.attr-name,
+.code-tooltip-content .token.string,
+.code-tooltip-content .token.char,
+.code-tooltip-content .token.builtin,
+.code-tooltip-content .token.inserted {
+  color: #10b981;
+}
+
+.code-tooltip-content .token.operator,
+.code-tooltip-content .token.entity,
+.code-tooltip-content .token.url,
+.code-tooltip-content .language-css .token.string,
+.code-tooltip-content .style .token.string {
+  color: #6366f1;
+}
+
+.code-tooltip-content .token.atrule,
+.code-tooltip-content .token.attr-value,
+.code-tooltip-content .token.keyword {
+  color: #8b5cf6;
+}
+
+.code-tooltip-content .token.function,
+.code-tooltip-content .token.class-name {
+  color: #06b6d4;
+}
+
+.code-tooltip-content .token.regex,
+.code-tooltip-content .token.important,
+.code-tooltip-content .token.variable {
+  color: #ec4899;
+}
+
+.code-tooltip-content .token.important,
+.code-tooltip-content .token.bold {
+  font-weight: bold;
+}
+
+.code-tooltip-content .token.italic {
+  font-style: italic;
+}
+
+.code-tooltip-content .token.entity {
+  cursor: help;
+}
+
+/* Enhanced code block styling */
+.code-tooltip-content code {
+  color: #e5e5e5;
+  background: none;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 0;
+}
+
+.code-tooltip-content pre[class*="language-"] {
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  background: none;
+  border: none;
+}
+
+.code-tooltip-content code[class*="language-"] {
+  background: none;
+  color: #e5e5e5;
+  text-shadow: none;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  tab-size: 2;
+  hyphens: none;
+}

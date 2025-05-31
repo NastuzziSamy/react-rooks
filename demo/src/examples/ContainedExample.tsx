@@ -1,5 +1,6 @@
-import React from "react";
 import { createRook } from "react-rooks";
+import CodeTooltip from "../components/CodeTooltip";
+import React from "react";
 
 const Locale = {
   EN: "en",
@@ -23,8 +24,43 @@ const [Rook, useRook] = createRook<{
   },
 });
 
+// Can be written using createStoreRook as well:
+// const [Rook, useRook] = createStoreRook({
+//   user: null as { id: number; name: string } | null,
+//   locale: Locale.EN as LocaleType,
+//   title: "Contained App",
+//   messages: [] as string[],
+// });
+
 const MessageManager = ({ instanceName }: { instanceName: string }) => {
+  // const [messages, setMessages] = [[], () => {}];
   const [messages, setMessages] = useRook("messages");
+  const rerendersRef = React.useRef(0);
+
+  rerendersRef.current += 1; // Track re-renders for demo purposes
+
+  const messageCodeTooltip = `// Contained Store - Each Rook instance has its own state
+const [Rook, useRook] = createRook({
+  defaultStore: {
+    user: null,
+    locale: "en",
+    title: "Contained App",
+    messages: [],
+  },
+});
+
+// Component using contained store
+const MessageManager = ({ instanceName }) => {
+  const [messages, setMessages] = useRook("messages");
+  
+  const addMessage = () => {
+    const newMessage = \`Message \${messages.length + 1} from \${instanceName}\`;
+    setMessages([...messages, newMessage]);
+  };
+  
+  // Each Rook instance maintains its own independent state
+  return <div>Messages: {messages.length}</div>;
+};`;
 
   const addMessage = () => {
     const newMessage = `Message ${messages.length + 1} from ${instanceName}`;
@@ -38,6 +74,7 @@ const MessageManager = ({ instanceName }: { instanceName: string }) => {
   return (
     <div className="demo-section">
       <h4>💬 Messages for {instanceName}</h4>
+      <CodeTooltip code={messageCodeTooltip} />
       <div className="demo-controls">
         <button className="demo-button" onClick={addMessage}>
           Add Message
@@ -56,51 +93,94 @@ const MessageManager = ({ instanceName }: { instanceName: string }) => {
           </ul>
         )}
       </div>
+      <div className="demo-info">
+        <strong>Re-renders:</strong> {rerendersRef.current} times
+      </div>
     </div>
   );
 };
 
 const InstanceManager = ({ instanceName }: { instanceName: string }) => {
+  const [store, updateStore] = useRook();
+  const rerendersRef = React.useRef(0);
+
+  rerendersRef.current += 1; // Track re-renders for demo purposes
+
+  const instanceCodeTooltip = `// Each Rook instance maintains separate state
+const InstanceManager = ({ instanceName }) => {
   const [user, setUser] = useRook("user");
   const [locale, setLocale] = useRook("locale");
+  
+  // Actions only affect THIS instance's state
+  const loginUser = () => {
+    setUser({ id: Date.now(), name: \`User \${instanceName}\` });
+  };
+  
+  // State is completely isolated between instances
+  return (
+    <div>
+      Instance: {instanceName}
+      User: {user ? user.name : "Not logged in"}
+      Locale: {locale}
+    </div>
+  );
+};
+
+// Usage with multiple isolated instances:
+<Rook key="instance1"><InstanceManager instanceName="A" /></Rook>
+<Rook key="instance2"><InstanceManager instanceName="B" /></Rook>`;
 
   const loginUser = () => {
-    setUser({ id: Date.now(), name: `User ${instanceName}` });
+    updateStore({ user: { id: Date.now(), name: `User ${instanceName}` } });
   };
 
   const logoutUser = () => {
-    setUser(null);
+    updateStore({ user: null });
   };
 
   return (
     <div className="demo-section">
       <h4>👤 User {instanceName}</h4>
+      <CodeTooltip code={instanceCodeTooltip} />
       <div className="demo-controls">
-        <button className="demo-button" onClick={loginUser}>
+        <button
+          className={"demo-button" + (store.user ? " secondary" : "")}
+          onClick={loginUser}
+        >
           Login
         </button>
-        <button className="demo-button secondary" onClick={logoutUser}>
+        <button
+          className={"demo-button" + (store.user ? "" : " secondary")}
+          onClick={logoutUser}
+        >
           Logout
         </button>
         <div className="locale-buttons">
           <button
-            className={`locale-button ${locale === Locale.EN ? "active" : ""}`}
-            onClick={() => setLocale(Locale.EN)}
+            className={`locale-button ${
+              store.locale === Locale.EN ? "active" : ""
+            }`}
+            onClick={() => updateStore({ locale: Locale.EN })}
           >
             EN
           </button>
           <button
-            className={`locale-button ${locale === Locale.FR ? "active" : ""}`}
-            onClick={() => setLocale(Locale.FR)}
+            className={`locale-button ${
+              store.locale === Locale.FR ? "active" : ""
+            }`}
+            onClick={() => updateStore({ locale: Locale.FR })}
           >
             FR
           </button>
         </div>
       </div>
       <div className="demo-state">
-        User: {user ? user.name : "Not logged in"}
+        User: {store.user?.name ?? "Not logged in"}
         <br />
-        Language: {locale.toUpperCase()}
+        Language: {store.locale.toUpperCase()}
+      </div>
+      <div className="demo-info">
+        <strong>Re-renders:</strong> {rerendersRef.current} times
       </div>
     </div>
   );

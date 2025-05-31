@@ -1,6 +1,6 @@
-import React from "react";
 import { createZodRook } from "../../../index-zod";
 import { z } from "zod";
+import CodeTooltip from "../components/CodeTooltip";
 
 // Schéma avec valeurs par défaut uniquement
 const TestSchema = z.object({
@@ -32,6 +32,39 @@ const TestComponent = () => {
   const [count, setCount] = useTest("count");
   const [theme, setTheme] = useTest("theme");
 
+  const defaultValuesCodeTooltip = `// Zod Schema with default values
+const TestSchema = z.object({
+  title: z.string().default("My App"),
+  count: z.number().default(0),
+  isActive: z.boolean().default(true),
+  theme: z.enum(["light", "dark"]).default("light"),
+  user: z.object({
+    name: z.string().default("Anonymous"),
+    email: z.string().email().default("user@example.com"),
+    preferences: z.object({
+      notifications: z.boolean().default(true),
+      language: z.string().default("en"),
+    }),
+  }),
+});
+
+// Create Rook WITHOUT defaultStore - uses schema defaults only!
+const [TestRook, useTest] = createZodRook({
+  schema: TestSchema,
+  onValidationError: (error) => {
+    console.error("Validation error:", error.errors);
+  },
+});
+
+// All default values come from Zod schema .default() methods
+const TestComponent = () => {
+  const [store] = useTest(); // Full store with defaults
+  const [title, setTitle] = useTest("title"); // "My App"
+  const [count, setCount] = useTest("count"); // 0
+  
+  return <div>Title: {title}, Count: {count}</div>;
+};`;
+
   return (
     <div className="example-demo">
       <div className="demo-info">
@@ -42,6 +75,7 @@ const TestComponent = () => {
 
       <div className="demo-section">
         <h3>🎯 Store actuel (valeurs par défaut automatiques)</h3>
+        <CodeTooltip code={defaultValuesCodeTooltip} />
         <div className="demo-state">
           <pre style={{ fontSize: "0.8rem", whiteSpace: "pre-wrap" }}>
             {JSON.stringify(store, null, 2)}
@@ -51,6 +85,35 @@ const TestComponent = () => {
 
       <div className="demo-section">
         <h3>✏️ Modifier les valeurs</h3>
+        <CodeTooltip
+          code={`// Modifying Zod validated values
+const ModifyComponent = () => {
+  const [title, setTitle] = useTest("title");
+  const [count, setCount] = useTest("count");
+  const [theme, setTheme] = useTest("theme");
+  
+  // All modifications are validated against Zod schema
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value); // Validated as string
+  };
+  
+  const handleCountChange = (e) => {
+    setCount(parseInt(e.target.value) || 0); // Validated as number
+  };
+  
+  const handleThemeChange = (newTheme) => {
+    setTheme(newTheme); // Validated as "light" | "dark"
+  };
+  
+  return (
+    <div>
+      <input value={title} onChange={handleTitleChange} />
+      <input type="number" value={count} onChange={handleCountChange} />
+      <button onClick={() => handleThemeChange("dark")}>Dark Theme</button>
+    </div>
+  );
+};`}
+        />
 
         <div style={{ marginBottom: "1rem" }}>
           <label style={{ display: "block", marginBottom: "0.5rem" }}>
