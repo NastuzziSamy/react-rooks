@@ -138,6 +138,7 @@ export const createStoreRook = <Store extends RookStore>(
     key?: StoreKey
   ) => UseStoreHookReturn<Store, StoreKey>
 ] => {
+  console.log("coucou");
   return createRook({
     defaultStore,
     reducers,
