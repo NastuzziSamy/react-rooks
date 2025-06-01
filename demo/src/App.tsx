@@ -5,9 +5,9 @@ import "./App.css";
 import ClassicExample from "./examples/ClassicExample";
 import ContainedExample from "./examples/ContainedExample";
 import ReducedExample from "./examples/ReducedExample";
-import ZodRookExample from "./examples/ZodRookExample";
+// import ZodRookExample from "./examples/ZodRookExample";
 import RookContainerExample from "./examples/RookContainerExample";
-import ZodDataValidationExample from "./examples/ZodDataValidationExample";
+// import ZodDataValidationExample from "./examples/ZodDataValidationExample";
 import RookIcon from "./components/RookIcon";
 
 const examples = [
@@ -35,18 +35,18 @@ const examples = [
     description: "Usage of createRook with reducers and business logic",
     component: ReducedExample,
   },
-  {
-    id: "zod-rook",
-    title: "createZodRook Example",
-    description: "Automatic Zod validation with createZodRook hook",
-    component: ZodRookExample,
-  },
-  {
-    id: "zod-data-validation",
-    title: "Zod Data Validation",
-    description: "Real-time validation of various data types with Zod",
-    component: ZodDataValidationExample,
-  },
+  // {
+  //   id: "zod-rook",
+  //   title: "createZodRook Example",
+  //   description: "Automatic Zod validation with createZodRook hook",
+  //   component: ZodRookExample,
+  // },
+  // {
+  //   id: "zod-data-validation",
+  //   title: "Zod Data Validation",
+  //   description: "Real-time validation of various data types with Zod",
+  //   component: ZodDataValidationExample,
+  // },
 ];
 
 function App() {

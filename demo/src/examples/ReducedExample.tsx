@@ -345,6 +345,12 @@ const UserCounter = () => {
 const ActionLogger = () => {
   const [lastAction] = useRook("lastAction");
 
+  const actionLoggerTooltip = `// Action Logger Component
+const ActionLogger = () => {
+  const [lastAction] = useRook("lastAction");
+  
+  // This component automatically updates when lastAction changes
+  // The lastAction value is updated by the storeReducer
   return (
     <div className="demo-section">
       <h3>📝 Last Action (Store Reducer)</h3>
@@ -353,12 +359,59 @@ const ActionLogger = () => {
   );
 };
 
+// Store reducer automatically updates lastAction on every change
+storeReducer: (newValues, store) => {
+  if (newValues.lazyTitle && newValues.lazyTitle !== store.lazyTitle) {
+    newValues.lastAction = \`Title changed to \${newValues.lazyTitle}\`;
+  } else if (newValues.locale && newValues.locale !== store.locale) {
+    newValues.lastAction = \`Locale changed to \${newValues.locale}\`;
+  } else if (newValues.userCount !== undefined) {
+    newValues.lastAction = \`User count changed to \${newValues.userCount}\`;
+  }
+  return newValues;
+}`;
+
+  return (
+    <div className="demo-section">
+      <h3>📝 Last Action (Store Reducer)</h3>
+      <CodeTooltip code={actionLoggerTooltip} />
+      <div className="status-display">{lastAction}</div>
+    </div>
+  );
+};
+
 const CompleteState = () => {
   const [store] = useRook();
+
+  const completeStateTooltip = `// Complete Store State Display
+const CompleteState = () => {
+  const [store] = useRook();
+  
+  // useRook() without parameters returns the entire store
+  // This component re-renders whenever any store value changes
+  return (
+    <div className="demo-section">
+      <h3>📊 Complete Store State</h3>
+      <div className="demo-state">
+        {JSON.stringify(store, null, 2)}
+      </div>
+    </div>
+  );
+};
+
+// Store structure:
+// {
+//   lazyTitle: "page_title",
+//   greetingKey: "greeting", 
+//   userCount: 0,
+//   lastAction: "Initialization",
+//   locale: "fr"
+// }`;
 
   return (
     <div className="demo-section">
       <h3>📊 Complete Store State</h3>
+      <CodeTooltip code={completeStateTooltip} />
       <div className="demo-state">{JSON.stringify(store, null, 2)}</div>
     </div>
   );
