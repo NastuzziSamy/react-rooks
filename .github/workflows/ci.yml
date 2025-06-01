@@ -1,0 +1,113 @@
+name: CI - Pull Request
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  test-library:
+    runs-on: ubuntu-latest
+    name: Test Library Build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build library
+        run: bun run build
+
+      - name: Validate build artifacts
+        run: |
+          echo "Checking ESM build..."
+          test -f dist/esm/index.js || (echo "❌ ESM build missing" && exit 1)
+          test -f dist/esm/index-zod.js || (echo "❌ ESM Zod build missing" && exit 1)
+          
+          echo "Checking CJS build..."
+          test -f dist/cjs/index.js || (echo "❌ CJS build missing" && exit 1)
+          test -f dist/cjs/index-zod.js || (echo "❌ CJS Zod build missing" && exit 1)
+          
+          echo "Checking TypeScript definitions..."
+          test -f dist/types/index.d.ts || (echo "❌ Main types missing" && exit 1)
+          test -f dist/types/index-zod.d.ts || (echo "❌ Zod types missing" && exit 1)
+          
+          echo "✅ All build artifacts present!"
+
+      - name: Check package.json exports
+        run: |
+          echo "Validating package.json exports..."
+          node -e "
+            const pkg = require('./package.json');
+            const requiredExports = ['.', './zod'];
+            const actualExports = Object.keys(pkg.exports || {});
+            
+            requiredExports.forEach(exp => {
+              if (!actualExports.includes(exp)) {
+                console.error(\`❌ Missing export: \${exp}\`);
+                process.exit(1);
+              }
+            });
+            
+            console.log('✅ Package exports are valid!');
+          "
+
+  test-demo:
+    runs-on: ubuntu-latest
+    name: Test Demo Build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install root dependencies
+        run: bun install
+
+      - name: Build library
+        run: bun run build
+
+      - name: Install demo dependencies
+        working-directory: ./demo
+        run: bun install
+
+      - name: Build demo
+        working-directory: ./demo
+        run: bun run build
+
+      - name: Validate demo build
+        working-directory: ./demo
+        run: |
+          test -d dist || (echo "❌ Demo dist folder missing" && exit 1)
+          test -f dist/index.html || (echo "❌ Demo index.html missing" && exit 1)
+          echo "✅ Demo build successful!"
+
+  lint-and-format:
+    runs-on: ubuntu-latest
+    name: Lint and Format Check
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install demo dependencies
+        working-directory: ./demo
+        run: bun install
+
+      - name: Lint demo
+        working-directory: ./demo
+        run: bun run lint

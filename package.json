@@ -50,7 +50,10 @@
     "build:types": "tsc --outDir dist/types --declaration --emitDeclarationOnly",
     "prepack": "bun run build",
     "demo": "cd demo && npm install && npm run dev",
-    "demo:build": "cd demo && npm install && npm run build"
+    "demo:build": "cd demo && npm install && npm run build",
+    "release": "bun run release:check && bun run release:tag",
+    "release:check": "echo 'Checking if ready for release...' && bun run build && echo 'Build successful! Ready for release.'",
+    "release:tag": "read -p 'Enter version (e.g., 1.0.0): ' VERSION && git tag v$VERSION && git push origin v$VERSION && echo 'Release tag v'$VERSION' pushed! GitHub Actions will handle publishing.'"
   },
   "files": [
     "/dist"
