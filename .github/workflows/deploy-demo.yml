@@ -5,10 +5,10 @@ on:
     branches:
       - master
     paths:
-      - 'demo/**'
-      - 'src/**'
-      - '.github/workflows/deploy-demo.yml'
-  
+      - "demo/**"
+      - "src/**"
+      - ".github/workflows/deploy-demo.yml"
+
   # Allow manual triggering
   workflow_dispatch:
 
@@ -53,11 +53,11 @@ jobs:
         run: |
           # Create react-rooks package directory
           mkdir -p node_modules/react-rooks
-          
+
           # Copy built files (only the specific folders we need)
           cp -r ../dist/esm/* node_modules/react-rooks/
           cp -r ../dist/types/*.d.ts node_modules/react-rooks/
-          
+
           # Create a simple package.json for the local package
           cat > node_modules/react-rooks/package.json << 'EOF'
           {
