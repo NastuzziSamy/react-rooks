@@ -4,7 +4,7 @@ export type StoreRead<T> = {
   readonly [P in keyof T]: T[P] extends object ? StoreRead<T[P]> : T[P];
 };
 
-export type RookStore = Record<string, any>;
+export type RookStore<Value extends any = any> = Record<string, Value>;
 export type RookStoreData<Store extends RookStore, Key> = Key extends Extract<
   keyof Store,
   string
@@ -88,7 +88,7 @@ export type UseStoreHookReturn<
       StoreRead<Store>[StoreKey],
       (
         value:
-          | StoreRead<Store[StoreKey]>
+          | Store[StoreKey]
           | ((
               prev: StoreRead<Store[Extract<StoreKey, keyof Store>]>
             ) => Store[Extract<StoreKey, keyof Store>])
