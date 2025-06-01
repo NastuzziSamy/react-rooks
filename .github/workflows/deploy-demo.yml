@@ -51,36 +51,35 @@ jobs:
       - name: Link local react-rooks to demo
         working-directory: ./demo
         run: |
-          # Create a symlink to use the local build
+          # Create react-rooks package directory
           mkdir -p node_modules/react-rooks
-          cp -r ../dist/* node_modules/react-rooks/
-          cp ../package.json node_modules/react-rooks/
+          
+          # Copy built files (only the specific folders we need)
+          cp -r ../dist/esm/* node_modules/react-rooks/
+          cp -r ../dist/types/*.d.ts node_modules/react-rooks/
+          
+          # Create a simple package.json for the local package
+          cat > node_modules/react-rooks/package.json << 'EOF'
+          {
+            "name": "react-rooks",
+            "version": "2.0.0",
+            "main": "./index.js",
+            "module": "./index.js",
+            "types": "./index.d.ts",
+            "exports": {
+              ".": {
+                "types": "./index.d.ts",
+                "import": "./index.js",
+                "require": "./index.js"
+              }
+            }
+          }
+          EOF
 
       - name: Build demo with base path
         working-directory: ./demo
         run: |
-          # Create a temporary vite config for GitHub Pages
-          cat > vite.config.github.ts << 'EOF'
-          import { defineConfig } from "vite";
-          import react from "@vitejs/plugin-react";
-          import { fileURLToPath, URL } from "node:url";
-
-          export default defineConfig({
-            plugins: [react()],
-            base: "/react-rooks/",
-            resolve: {
-              alias: {
-                "react-rooks": fileURLToPath(new URL("../index.tsx", import.meta.url)),
-                "react-rooks/zod": fileURLToPath(
-                  new URL("../index-zod.tsx", import.meta.url)
-                ),
-              },
-            },
-            optimizeDeps: {
-              exclude: ["react-rooks", "react-rooks/zod"],
-            },
-          });
-          EOF
+          # Use the GitHub Pages specific config
           bun run build --config vite.config.github.ts
         env:
           NODE_ENV: production
