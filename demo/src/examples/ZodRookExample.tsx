@@ -17,21 +17,19 @@ const AppStoreSchema = z.object({
     .optional(),
   theme: z.enum(["light", "dark"]).default("light"),
   locale: z.enum(["en", "fr"]).default("en"),
-  settings: z.object({
-    notifications: z.boolean().default(true),
-    autoSave: z.boolean().default(false),
-    maxItems: z.number().min(1).max(100).default(10),
-  }),
+  // settings: z.object({
+  //   notifications: z.boolean().default(true),
+  //   autoSave: z.boolean().default(false),
+  //   maxItems: z.number().min(1).max(100).default(10),
+  // }),
   items: z.array(z.string().min(1, "Item cannot be empty")).default([]),
 });
 
 // Créer le Rook avec validation Zod automatique
-const [AppRook, useAppStore] = createZodRook({
-  schema: AppStoreSchema,
+const [AppRook, useAppStore] = createZodRook(AppStoreSchema, {
   onValidationError: (error) => {
     console.error("Zod validation error:", error.errors);
   },
-  strict: false, // En mode non-strict pour permettre les mises à jour même avec erreurs
 });
 
 const UserForm = () => {

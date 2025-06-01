@@ -5,12 +5,9 @@ import "./App.css";
 import ClassicExample from "./examples/ClassicExample";
 import ContainedExample from "./examples/ContainedExample";
 import ReducedExample from "./examples/ReducedExample";
-import ZodExample from "./examples/ZodExample";
 import ZodRookExample from "./examples/ZodRookExample";
-import DefaultValuesExample from "./examples/DefaultValuesExample";
 import RookContainerExample from "./examples/RookContainerExample";
-import SimpleZodExample from "./examples/SimpleZodExample";
-import ZodWithInitExample from "./examples/ZodWithInitExample";
+import ZodDataValidationExample from "./examples/ZodDataValidationExample";
 import RookIcon from "./components/RookIcon";
 
 const examples = [
@@ -39,34 +36,16 @@ const examples = [
     component: ReducedExample,
   },
   {
-    id: "zod",
-    title: "Example with Zod",
-    description: "Schema validation with createSchemedRook",
-    component: ZodExample,
-  },
-  {
     id: "zod-rook",
     title: "createZodRook Example",
     description: "Automatic Zod validation with createZodRook hook",
     component: ZodRookExample,
   },
   {
-    id: "default-values",
-    title: "Default Values Test",
-    description: "Test automatic default values from Zod schema",
-    component: DefaultValuesExample,
-  },
-  {
-    id: "simple-zod",
-    title: "Simple Zod Example",
-    description: "Basic usage of react-rooks/zod import",
-    component: SimpleZodExample,
-  },
-  {
-    id: "zod-with-init",
-    title: "Zod with Init Function",
-    description: "Using createZodRook with async initialization",
-    component: ZodWithInitExample,
+    id: "zod-data-validation",
+    title: "Zod Data Validation",
+    description: "Real-time validation of various data types with Zod",
+    component: ZodDataValidationExample,
   },
 ];
 

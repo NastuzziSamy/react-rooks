@@ -5,17 +5,22 @@ import {
   ZodTypeAny,
   ZodNullable,
   ZodOptional,
+  ZodEffects,
 } from "zod";
 import { createRook } from "./create";
 import { RookStore, StoreRead } from "./type";
 
+export type ZodDefinedType =
+  | ZodDefault<ZodTypeAny>
+  | ZodNullable<ZodTypeAny>
+  | ZodOptional<ZodTypeAny>;
 export type RookZodStore = RookStore<
-  ZodDefault<ZodTypeAny> | ZodNullable<ZodTypeAny> | ZodOptional<ZodTypeAny>
+  ZodDefinedType | ZodEffects<ZodDefinedType>
 >;
 
 export const createZodRook = <
-  Schema extends ZodObject<RookZodStore>,
-  Store extends z.infer<Schema>
+  Schema extends ZodObject<RookZodStore> | ZodEffects<ZodObject<RookZodStore>>,
+  Store extends z.input<Schema>
 >(
   schema: Schema,
   {
@@ -33,6 +38,7 @@ export const createZodRook = <
     ) => void;
   } = {}
 ) => {
+  console.log("Default store:", schema);
   const defaultStore = schema.parse({}) as Store;
 
   const storeReducer = (
