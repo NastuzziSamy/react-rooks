@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-🎮 **[Try the Interactive Demo →](./demo)** | 📖 [Documentation](#api-reference) | 🚀 [Quick Start](#quick-start)
+🎮 **[Try the Interactive Demo →](https://nastuzzisamy.github.io/react-rooks/)** | 📖 [Documentation](#api-reference) | 🚀 [Quick Start](#quick-start)
 
 ---
 
@@ -16,7 +16,7 @@
 
 **If you love `useState` but need global state**, React Rooks is for you. It's designed to feel exactly like React's built-in hooks while providing powerful state management capabilities.
 
-> 💡 **New to React Rooks?** Check out our [interactive demo](./demo) to see all features in action with real-time state inspection and code tooltips!
+> 💡 **New to React Rooks?** Check out our [interactive demo](https://nastuzzisamy.github.io/react-rooks/) to see all features in action with real-time state inspection and code tooltips!
 
 ### ✨ Key Benefits
 
