@@ -110,9 +110,7 @@ export function createRook<
       Provider={context.Provider}
       storeReducer={storeReducer}
       reducers={reducers}
-      init={
-        init || (async (initStore) => ({ ...initStore } as unknown as Store))
-      }
+      init={init || ((initStore) => ({ ...initStore } as unknown as Store))}
       defaultStore={(defaultStore || {}) as DefaultStore}
     >
       {children}
@@ -138,7 +136,6 @@ export const createStoreRook = <Store extends RookStore>(
     key?: StoreKey
   ) => UseStoreHookReturn<Store, StoreKey>
 ] => {
-  console.log("coucou");
   return createRook({
     defaultStore,
     reducers,

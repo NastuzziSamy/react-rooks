@@ -57,6 +57,7 @@ const [Rook, useRook] = createRook<{
   lazyTitle: string;
   greetingKey: string;
   userCount: number;
+  delayed: number;
   lastAction: string;
   locale: LocaleType;
 }>({
@@ -64,6 +65,7 @@ const [Rook, useRook] = createRook<{
     lazyTitle: "page_title",
     greetingKey: "greeting",
     userCount: 0,
+    delayed: 0,
     lastAction: "Initialization",
     locale: Locale.FR,
   },
@@ -86,6 +88,16 @@ const [Rook, useRook] = createRook<{
       console.log(`👥 User count: ${oldValue} → ${newValue}`);
       return newValue;
     },
+    delayed: async (newValue, oldValue) => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          console.log(
+            `⏳ Delayed ${oldValue}ms value updated: ${oldValue} → ${newValue}`
+          );
+          resolve(newValue);
+        }, oldValue); // Simulate async operation
+      });
+    },
   },
   storeReducer: (newValues, store) => {
     // Store reducer - handles side effects and updates
@@ -104,6 +116,8 @@ const [Rook, useRook] = createRook<{
       } else {
         newValues.lastAction = `User count changed to ${newValues.userCount}`;
       }
+    } else if (newValues.delayed !== undefined) {
+      newValues.lastAction = `Delayed value set to ${newValues.delayed} after waiting ${store.delayed}ms`;
     }
 
     return newValues;
@@ -381,6 +395,72 @@ storeReducer: (newValues, store) => {
   );
 };
 
+const DelayedControl = () => {
+  const [delayed, setDelayed] = useRook("delayed");
+
+  const delayOptions = [1000, 2000, 5000] as const;
+
+  const delayedTooltip = `// Delayed Value with Async Reducer
+const [Rook, useRook] = createRook({
+  defaultStore: {
+    delayed: 0,
+    // ...other state
+  },
+  reducers: {
+    delayed: async (newValue, oldValue) => {
+      // Async reducer simulates delayed operation
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          console.log(
+            \`⏳ Delayed \${oldValue}ms value updated: \${oldValue} → \${newValue}\`
+          );
+          resolve(newValue);
+        }, oldValue); // Wait for the old value before updating
+      });
+    },
+  },
+});
+
+// Component using async delayed reducer
+const DelayedControl = () => {
+  const [delayed, setDelayed] = useRook("delayed");
+  
+  // When delayed changes, reducer waits for the old delay duration
+  // before updating to the new value
+  return (
+    <div>
+      <button onClick={() => setDelayed(1000)}>1 seconde</button>
+      <button onClick={() => setDelayed(2000)}>2 secondes</button>
+      <button onClick={() => setDelayed(5000)}>5 secondes</button>
+      <div>Délai actuel: {delayed}ms</div>
+    </div>
+  );
+};`;
+
+  return (
+    <div className="demo-section">
+      <h3>⏳ Contrôle de Délai (Reducer Asynchrone)</h3>
+      <CodeTooltip code={delayedTooltip} />
+      <div className="demo-controls">
+        {delayOptions.map((delay) => (
+          <button
+            key={delay}
+            className={`demo-button ${delayed === delay ? "" : "secondary"}`}
+            onClick={() => setDelayed(delay)}
+          >
+            {delay / 1000} seconde{delay > 1000 ? "s" : ""}
+          </button>
+        ))}
+      </div>
+      <div className="demo-state">Délai actuel: {delayed}ms</div>
+      <div className="demo-info">
+        💡 Le reducer attend le délai précédent avant de mettre à jour la
+        nouvelle valeur
+      </div>
+    </div>
+  );
+};
+
 const CompleteState = () => {
   const [store] = useRook();
 
@@ -431,6 +511,7 @@ const ReducedExample = () => {
         <TranslationDisplay />
         <TitleManager />
         <UserCounter />
+        <DelayedControl />
         <ActionLogger />
         <CompleteState />
 

@@ -17,12 +17,12 @@ export const Rook = <
     store: null,
   });
 
-  const reduceValues = (
+  const reduceValues = async (
     values: Partial<Store>,
     currentStore: StoreRead<Store>
   ) => {
     if (storeReducer) {
-      values = storeReducer(values, currentStore);
+      values = await storeReducer(values, currentStore);
     }
 
     if (!reducers) {
@@ -36,7 +36,7 @@ export const Rook = <
       }
 
       // Type assertion to ensure TypeScript knows the value exists
-      values[name] = reducer(
+      values[name] = await reducer(
         values[name] as Store[Extract<keyof Store, string>],
         currentStore[name]
       );
@@ -47,27 +47,30 @@ export const Rook = <
 
   const updateStore = React.useCallback(
     (values: Partial<Store> | ((prev: StoreRead<Store>) => Partial<Store>)) => {
-      setRookState((currentState) => {
-        if (!currentState.inited) {
-          return currentState;
+      (async () => {
+        if (!rookState.inited) {
+          return;
         }
 
         // Si values est une fonction, l'appeler avec le store actuel
         const valuesToApply =
-          typeof values === "function" ? values(currentState.store) : values;
+          typeof values === "function" ? values(rookState.store) : values;
 
-        const reducedValues = reduceValues(valuesToApply, currentState.store);
+        const reducedValues = await reduceValues(
+          valuesToApply,
+          rookState.store
+        );
 
-        return {
+        setRookState({
           store: {
-            ...currentState.store,
+            ...rookState.store,
             ...reducedValues,
           },
           inited: true,
-        };
-      });
+        });
+      })();
     },
-    [storeReducer, reducers]
+    [rookState, storeReducer, reducers]
   );
 
   React.useEffect(() => {

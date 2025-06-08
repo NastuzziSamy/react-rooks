@@ -42,23 +42,23 @@ export type RookState<Store extends RookStore> =
 export type RookInit<
   Store extends RookStore,
   DefaultStore extends RookStore
-> = (initStore: StoreRead<DefaultStore>) => Promise<Store>;
+> = (initStore: StoreRead<DefaultStore>) => Store | Promise<Store>;
 
 export type RookStoreReducer<Store extends RookStore> = (
   values: Partial<Store>,
   store: StoreRead<Store>
-) => Partial<Store>;
+) => Partial<Store> | Promise<Partial<Store>>;
 
 export type RookReducer<
   Store extends RookStore,
   Key extends Extract<keyof Store, string>
-> = (newValue: Store[Key], oldValue: StoreRead<Store[Key]>) => Store[Key];
+> = (
+  newValue: Store[Key],
+  oldValue: StoreRead<Store[Key]>
+) => Store[Key] | Promise<Store[Key]>;
 
 export type RookReducers<Store extends RookStore> = Partial<{
-  [Key in Extract<keyof Store, string>]: (
-    newValue: Store[Key],
-    oldValue: StoreRead<Store[Key]>
-  ) => Store[Key];
+  [Key in Extract<keyof Store, string>]: RookReducer<Store, Key>;
 }>;
 
 export type RookProps<
