@@ -38,7 +38,6 @@ export const createZodRook = <
     ) => void;
   } = {}
 ) => {
-  console.log("Default store:", schema);
   const defaultStore = schema.parse({}) as Store;
 
   const storeReducer = (
