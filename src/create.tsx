@@ -33,9 +33,16 @@ export const createUseRook =
           prev: StoreRead<StoreValue>
         ) => StoreValue;
 
-        update({
-          [key]: transformValue(store[key]),
-        } as Partial<Store>);
+        // Defer the read of the current value to update() so we always see
+        // the latest store, not the snapshot captured when useRook ran.
+        update(
+          (prev) =>
+            ({
+              [key]: transformValue(
+                prev[key] as StoreRead<StoreValue>
+              ),
+            } as Partial<Store>)
+        );
 
         return;
       }
