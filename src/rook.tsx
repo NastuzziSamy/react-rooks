@@ -89,30 +89,37 @@ export const Rook = <
           return;
         }
 
-        const currentStore = storeRef.current;
-        const valuesToApply =
-          typeof values === "function" ? values(currentStore) : values;
+        try {
+          const currentStore = storeRef.current;
+          const valuesToApply =
+            typeof values === "function" ? values(currentStore) : values;
 
-        const reducedValues = await reduceValues(valuesToApply, currentStore);
+          const reducedValues = await reduceValues(valuesToApply, currentStore);
 
-        const nextStore = {
-          ...currentStore,
-          ...reducedValues,
-        };
-        // Update the ref synchronously so the next queued update sees the
-        // freshly-applied values — React's setState is async but the next
-        // iteration of our queue runs before React commits.
-        storeRef.current = nextStore;
-
-        setRookState((prev) => {
-          if (!prev.inited) {
-            return prev;
-          }
-          return {
-            inited: true,
-            store: nextStore,
+          const nextStore = {
+            ...currentStore,
+            ...reducedValues,
           };
-        });
+          // Update the ref synchronously so the next queued update sees the
+          // freshly-applied values — React's setState is async but the next
+          // iteration of our queue runs before React commits.
+          storeRef.current = nextStore;
+
+          setRookState((prev) => {
+            if (!prev.inited) {
+              return prev;
+            }
+            return {
+              inited: true,
+              store: nextStore,
+            };
+          });
+        } catch (error) {
+          // Swallow the error at the queue boundary so a single failing
+          // reducer cannot permanently stall all subsequent updates. Surface
+          // it to the host so callers can still observe failures.
+          console.error("[react-rooks] updateStore failed:", error);
+        }
       });
     },
     [reduceValues]

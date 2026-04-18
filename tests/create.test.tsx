@@ -221,16 +221,29 @@ describe("createStoreRook", () => {
     );
   });
 
-  it("does not mutate the values object passed to storeReducer", async () => {
-    const received: Array<object> = [];
+  it("does not mutate the values object the caller originally passed", async () => {
+    // Capture the exact values object that storeReducer was handed along
+    // with a snapshot of its contents at call time. Configure a per-key
+    // reducer too: the historical bug was `nextValues[name] = ...` inside
+    // the per-key loop, which mutated the object storeReducer had returned.
+    const captured: Array<{
+      ref: Partial<Counter>;
+      snapshot: Partial<Counter>;
+    }> = [];
     const storeReducer = vi.fn((values: Partial<Counter>) => {
-      received.push(values);
+      captured.push({ ref: values, snapshot: { ...values } });
       return values;
     });
+    const perKeyReducer = vi.fn((value: number) => value * 2);
 
     const [Rook, useRook] = createStoreRook<Counter>(
       { count: 0, label: "init" },
-      { storeReducer }
+      {
+        storeReducer,
+        reducers: {
+          count: perKeyReducer,
+        },
+      }
     );
 
     const Component = () => {
@@ -252,15 +265,19 @@ describe("createStoreRook", () => {
     await act(async () => {
       btn.click();
     });
+    await act(async () => {
+      btn.click();
+    });
 
-    await waitFor(() => expect(storeReducer).toHaveBeenCalled());
+    await waitFor(() => expect(perKeyReducer).toHaveBeenCalled());
 
-    // The object we handed to the reducer must not be the same reference as
-    // the one eventually applied: reducers receive a copy and library code
-    // must not mutate what the caller gave it.
-    for (const v of received) {
-      expect(Object.isFrozen(v)).toBe(false);
-      expect(v).toMatchObject({ count: 1 });
+    // Each object we saw must still hold the exact values it had at the
+    // moment storeReducer returned it. If the per-key reducer loop mutated
+    // the returned object in place, `count` would no longer be 1 but the
+    // post-reduction value (2).
+    expect(captured.length).toBeGreaterThan(0);
+    for (const { ref, snapshot } of captured) {
+      expect(ref).toEqual(snapshot);
     }
   });
 });
