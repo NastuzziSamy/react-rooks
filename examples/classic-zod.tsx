@@ -12,7 +12,7 @@ export const rookSchema = z.object({
     .object({ id: z.number(), name: z.string() })
     .nullable()
     .transform((val) => (val ? { id: val.id, name: val.name } : null)),
-  locale: z.nativeEnum(Locale).default(Locale.EN),
+  locale: z.enum(Locale).default(Locale.EN),
   title: z.string().default("My React app"),
   inputNumber: z.coerce.number().optional(),
 });
@@ -77,28 +77,27 @@ export const ShowLocale = () => {
   );
 };
 
-// Will on work with Zod v4
-// export const InputNumber = () => {
-//   const [inputNumber, setInputNumber] = useRook("inputNumber");
+export const InputNumber = () => {
+  const [inputNumber, setInputNumber] = useRook("inputNumber");
 
-//   return (
-//     <div>
-//       <h2>Input Number</h2>
-//       <input
-//         type="number"
-//         value={inputNumber ?? ""}
-//         onChange={(e) => setInputNumber(e.target.value)}
-//       />
-//       <p>Current input number: {inputNumber}</p>
-//     </div>
-//   );
-// };
+  return (
+    <div>
+      <h2>Input Number</h2>
+      <input
+        type="number"
+        value={(inputNumber as number | undefined) ?? ""}
+        onChange={(e) => setInputNumber(e.target.value)}
+      />
+      <p>Current input number: {String(inputNumber ?? "")}</p>
+    </div>
+  );
+};
 
 export const App = () => (
   <Rook>
     <ChangeLocale />
     <ShowLocale />
-    {/* <InputNumber /> */}
+    <InputNumber />
   </Rook>
 );
 
