@@ -59,10 +59,10 @@ yarn add react-rooks
 ### Basic Usage
 
 ```tsx
-import { createRook } from "react-rooks";
+import { createStoreRook } from "react-rooks";
 
 // 1. Create a store (like useState, but global)
-export const [UserStore, useUser] = createRook({
+export const [UserStore, useUser] = createStoreRook({
   name: "John Doe",
   email: "john@example.com",
   theme: "light" as "light" | "dark",
@@ -114,7 +114,7 @@ function Counter() {
 }
 
 // After: global state (same API)
-const [CounterStore, useCounter] = createRook({ count: 0 });
+const [CounterStore, useCounter] = createStoreRook({ count: 0 });
 
 function Counter() {
   const [count, setCount] = useCounter("count");
@@ -126,35 +126,55 @@ function Counter() {
 
 ## API Reference
 
-### `createRook(initialStore, reducers?)`
+### `createStoreRook(defaultStore, options?)`
 
-Creates a global store with optional reducers.
+Shorthand for the most common case: a global store created from a plain object. Accepts `reducers` and `storeReducer` in the options.
+
+```tsx
+import { createStoreRook } from "react-rooks";
+
+const [Store, useStore] = createStoreRook(
+  { count: 0 },
+  {
+    reducers: {
+      count: (state, action) => {
+        switch (action.type) {
+          case "increment":
+            return state + 1;
+          case "decrement":
+            return state - 1;
+          default:
+            return state;
+        }
+      },
+    },
+  }
+);
+```
+
+### `createRook({ defaultStore?, init?, reducers?, storeReducer? })`
+
+The full-featured factory. Use it when you need `init` (async initialization that reads from `defaultStore`) or when you want to explicitly type the store.
 
 ```tsx
 import { createRook } from "react-rooks";
 
 // Basic store
 const [Store, useStore] = createRook({
-  count: 0,
-  user: { name: "", email: "" },
+  defaultStore: {
+    count: 0,
+    user: { name: "", email: "" },
+  },
 });
 
-// With reducers
-const [Store, useStore] = createRook(
-  { count: 0 },
-  {
-    count: (state, action) => {
-      switch (action.type) {
-        case "increment":
-          return state + 1;
-        case "decrement":
-          return state - 1;
-        default:
-          return state;
-      }
-    },
-  }
-);
+// Async initialization from a default store
+const [UserStore, useUser] = createRook({
+  defaultStore: { user: null as User | null },
+  init: async (initStore) => ({
+    ...initStore,
+    user: await fetchCurrentUser(),
+  }),
+});
 ```
 
 ### `useRook(key?)`
@@ -180,10 +200,10 @@ setCount(42);
 Combine multiple stores.
 
 ```tsx
-import { RookContainer } from "react-rooks";
+import { RookContainer, createStoreRook } from "react-rooks";
 
-const [UserStore] = createRook({ name: "" });
-const [ThemeStore] = createRook({ mode: "light" });
+const [UserStore] = createStoreRook({ name: "" });
+const [ThemeStore] = createStoreRook({ mode: "light" });
 
 function App() {
   return (
@@ -288,12 +308,12 @@ export const [Rook, useRook] = createZodRook(schema, {
 ### Multiple stores with scoping
 
 ```tsx
-const [UserStore, useUser] = createRook({
+const [UserStore, useUser] = createStoreRook({
   profile: { name: "", email: "" },
   preferences: { theme: "light", notifications: true },
 });
 
-const [CartStore, useCart] = createRook({
+const [CartStore, useCart] = createStoreRook({
   items: [],
   total: 0,
 });
@@ -354,25 +374,30 @@ The order of stores in `RookContainer` is crucial. Stores are nested from top to
 ### Custom reducers
 
 ```tsx
-const [TodoStore, useTodos] = createRook(
+const [TodoStore, useTodos] = createStoreRook(
   {
     todos: [],
     filter: "all",
   },
   {
-    todos: (state, action) => {
-      switch (action.type) {
-        case "ADD_TODO":
-          return [...state, { id: Date.now(), text: action.text, done: false }];
-        case "TOGGLE_TODO":
-          return state.map((todo) =>
-            todo.id === action.id ? { ...todo, done: !todo.done } : todo
-          );
-        case "DELETE_TODO":
-          return state.filter((todo) => todo.id !== action.id);
-        default:
-          return state;
-      }
+    reducers: {
+      todos: (state, action) => {
+        switch (action.type) {
+          case "ADD_TODO":
+            return [
+              ...state,
+              { id: Date.now(), text: action.text, done: false },
+            ];
+          case "TOGGLE_TODO":
+            return state.map((todo) =>
+              todo.id === action.id ? { ...todo, done: !todo.done } : todo
+            );
+          case "DELETE_TODO":
+            return state.filter((todo) => todo.id !== action.id);
+          default:
+            return state;
+        }
+      },
     },
   }
 );
@@ -388,9 +413,9 @@ function TodoList() {
 ### Server-side rendering (SSR)
 
 ```tsx
-import { createRook } from "react-rooks";
+import { createStoreRook } from "react-rooks";
 
-const [AppStore, useApp] = createRook({
+const [AppStore, useApp] = createStoreRook({
   user:
     typeof window !== "undefined"
       ? JSON.parse(localStorage.getItem("user") || "null")
@@ -419,10 +444,10 @@ The same shopping cart feature, implemented across different state management so
 ### React Rooks (22 lines)
 
 ```tsx
-import { createRook } from "react-rooks";
+import { createStoreRook } from "react-rooks";
 
 // 1. Create store (2 lines)
-const [CartStore, useCart] = createRook({
+const [CartStore, useCart] = createStoreRook({
   items: [] as Array<{
     id: number;
     name: string;
