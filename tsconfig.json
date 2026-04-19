@@ -14,8 +14,17 @@
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
+    "skipLibCheck": true,
     "allowSyntheticDefaultImports": true
   },
-  // "include": ["src"],
-  "exclude": ["node_modules", "dist", "examples", "demo"]
+  "include": ["src", "index.tsx", "index-zod.tsx"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "examples",
+    "demo",
+    "tests",
+    "vitest.config.mts",
+    "eslint.config.mjs"
+  ]
 }

@@ -104,6 +104,15 @@ jobs:
         with:
           bun-version: latest
 
+      - name: Install root dependencies
+        run: bun install
+
+      - name: Lint library
+        run: bun run lint
+
+      - name: Typecheck library
+        run: bun run typecheck
+
       - name: Install demo dependencies
         working-directory: ./demo
         run: bun install
@@ -111,3 +120,21 @@ jobs:
       - name: Lint demo
         working-directory: ./demo
         run: bun run lint
+
+  test-unit:
+    runs-on: ubuntu-latest
+    name: Unit Tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install root dependencies
+        run: bun install
+
+      - name: Run tests
+        run: bun run test
