@@ -2,24 +2,27 @@ import {
   z,
   ZodObject,
   ZodDefault,
-  ZodTypeAny,
+  ZodType,
   ZodNullable,
   ZodOptional,
-  ZodEffects,
+  ZodPipe,
+  ZodTransform,
 } from "zod";
 import { createRook } from "./create";
 import { RookStore, StoreRead } from "./type";
 
 export type ZodDefinedType =
-  | ZodDefault<ZodTypeAny>
-  | ZodNullable<ZodTypeAny>
-  | ZodOptional<ZodTypeAny>;
+  | ZodDefault<ZodType>
+  | ZodNullable<ZodType>
+  | ZodOptional<ZodType>;
 export type RookZodStore = RookStore<
-  ZodDefinedType | ZodEffects<ZodDefinedType>
+  ZodDefinedType | ZodPipe<ZodDefinedType, ZodTransform>
 >;
 
 export const createZodRook = <
-  Schema extends ZodObject<RookZodStore> | ZodEffects<ZodObject<RookZodStore>>,
+  Schema extends
+    | ZodObject<RookZodStore>
+    | ZodPipe<ZodObject<RookZodStore>, ZodTransform>,
   Store extends z.input<Schema>
 >(
   schema: Schema,

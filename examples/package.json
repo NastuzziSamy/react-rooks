@@ -7,6 +7,6 @@
   "dependencies": {
     "react-rooks": "../",
     "react": "^18.0.0",
-    "zod": "^3.0.0"
+    "zod": "^4.3.0"
   }
 }
